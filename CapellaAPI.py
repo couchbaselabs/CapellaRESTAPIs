@@ -471,3 +471,61 @@ class CapellaAPI(CapellaAPIRequests):
               .format(self.internal_url, tenant_id, project_id, cluster_id, private_network_id)
         resp = self._urllib_request(url, method="GET", headers=capella_header)
         return resp
+
+    def get_scopes(self, cluster_id, bucket):
+        """Get all scopes + collections for a bucket.
+        
+        Sample response data:
+        ```
+        {'scopes': [
+            {'collections': [{'maxTTL': 0, 'name': 'collection-1', 'uid': '8'}],
+             'name': 'scope-1',
+             'uid': '8'},
+            {'collections': [{'maxTTL': 0, 'name': '_default', 'uid': '0'}],
+             'name': '_default',
+             'uid': '0'}
+            ],
+        'uid': '2'}
+        ```
+        """
+        capella_header = self.get_authorization_internal()
+        url = "{}/v2/databases/{}/proxy/pools/default/buckets/{}/scopes"\
+              .format(self.internal_url, cluster_id, bucket)
+        resp = self._urllib_request(url, method="GET", headers=capella_header)
+        return resp
+
+    def create_scope(self, cluster_id, bucket, scope):
+        capella_header = self.get_authorization_internal()
+        capella_header['Content-Type'] = 'application/x-www-form-urlencoded'
+        url = "{}/v2/databases/{}/proxy/pools/default/buckets/{}/scopes"\
+              .format(self.internal_url, cluster_id, bucket)
+        data = {'name': scope}
+        resp = self._urllib_request(url, method="POST",
+                                    params=data,
+                                    headers=capella_header)
+        return resp
+
+    def delete_scope(self, cluster_id, bucket, scope):
+        capella_header = self.get_authorization_internal()
+        url = "{}/v2/databases/{}/proxy/pools/default/buckets/{}/scopes/{}"\
+              .format(self.internal_url, cluster_id, bucket, scope)
+        resp = self._urllib_request(url, method="DELETE", headers=capella_header)
+        return resp
+
+    def create_collection(self, cluster_id, bucket, scope, collection, maxTTL=0):
+        capella_header = self.get_authorization_internal()
+        capella_header['Content-Type'] = 'application/x-www-form-urlencoded'
+        url = "{}/v2/databases/{}/proxy/pools/default/buckets/{}/scopes/{}/collections"\
+              .format(self.internal_url, cluster_id, bucket, scope)
+        data = {'name': collection, 'maxTTL': maxTTL}
+        resp = self._urllib_request(url, method="POST",
+                                    params=data,
+                                    headers=capella_header)
+        return resp
+
+    def delete_collection(self, cluster_id, bucket, scope, collection):
+        capella_header = self.get_authorization_internal()
+        url = "{}/v2/databases/{}/proxy/pools/default/buckets/{}/scopes/{}/collections/{}"\
+              .format(self.internal_url, cluster_id, bucket, scope, collection)
+        resp = self._urllib_request(url, method="DELETE", headers=capella_header)
+        return resp
