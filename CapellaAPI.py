@@ -352,6 +352,15 @@ class CapellaAPI(CapellaAPIRequests):
                                     headers=capella_header)
         return resp
 
+    def delete_cluster_internal(self, tenant_id, project_id, cluster_id):
+        capella_header = self.get_authorization_internal()
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}"\
+              .format(tenant_id, project_id, cluster_id)
+        resp = self._urllib_request(url, method="DELETE",
+                                    params='',
+                                    headers=capella_header)
+        return resp
+
     def get_deployment_options(self, tenant_id):
         """
         Get deployment options, including a suggested CIDR for deploying a
