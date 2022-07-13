@@ -38,13 +38,7 @@ class CapellaAPIRequests(object):
         self._log.info(api_endpoint)
 
         try:
-            if params == None:
-                cbc_api_response = self.network_session.get(
-                    self.API_BASE_URL + api_endpoint,
-                    auth=CapellaAPIAuth(self.SECRET, self.ACCESS),
-                    verify=False)
-            else:
-                cbc_api_response = self.network_session.get(
+            cbc_api_response = self.network_session.get(
                     self.API_BASE_URL + api_endpoint,
                     auth=CapellaAPIAuth(self.SECRET, self.ACCESS),
                     params=params,
