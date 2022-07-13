@@ -33,17 +33,23 @@ class CapellaAPIRequests(object):
         self._log.setLevel(level)
 
     # Methods
-    def capella_api_get(self, api_endpoint):
+    def capella_api_get(self, api_endpoint, params=None):
         cbc_api_response = None
-
         self._log.info(api_endpoint)
 
         try:
-            cbc_api_response = self.network_session.get(
-                self.API_BASE_URL + api_endpoint,
-                auth=CapellaAPIAuth(self.SECRET, self.ACCESS),
-                verify=False)
-            self._log.debug(cbc_api_response.content)
+            if params == None:
+                cbc_api_response = self.network_session.get(
+                    self.API_BASE_URL + api_endpoint,
+                    auth=CapellaAPIAuth(self.SECRET, self.ACCESS),
+                    verify=False)
+            else:
+                cbc_api_response = self.network_session.get(
+                    self.API_BASE_URL + api_endpoint,
+                    auth=CapellaAPIAuth(self.SECRET, self.ACCESS),
+                    params=params,
+                    verify=False)
+            self._log.info(cbc_api_response.content)
 
         except requests.exceptions.HTTPError:
             error = pprint.pformat(cbc_api_response.json())

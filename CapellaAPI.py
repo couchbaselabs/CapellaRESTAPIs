@@ -35,9 +35,12 @@ class CapellaAPI(CapellaAPIRequests):
         self._log.setLevel(level)
 
     # Cluster methods
-    def get_clusters(self):
-        capella_api_response = self.capella_api_get('/v3/clusters')
-
+    # Cluster methods
+    def get_clusters(self, params=None):
+        if params==None :
+            capella_api_response = self.capella_api_get('/v3/clusters')
+        else:
+            capella_api_response = self.capella_api_get('/v3/clusters', params)
         return (capella_api_response)
 
     def get_cluster_info(self, cluster_id):
