@@ -483,24 +483,23 @@ class CapellaAPI(CapellaAPIRequests):
                                     params=json.dumps(specs),
                                     headers=capella_header)
         return resp
-                                    
-    def restore_from_backup(self, cluster_name, project_name, bucket_name):
+
+    def restore_from_backup(self, tenant_id, project_id, cluster_id, bucket_name):
         """
         method used to restore from the backup
-        :param cluster_name:
-        :param project_name:
+        :param tenant_id:
+        :param project_id:
+        :param cluster_id:
         :param bucket_name:
         :return: response object
         """
-        cluster_id = self.get_cluster_id(cluster_name=cluster_name)
         payload = {"sourceClusterId": cluster_id,
                    "targetClusterId": cluster_id,
                    "options": {"services": ["data", "query", "index", "search"], "filterKeys": "", "filterValues": "",
                                "mapData": "", "includeData": "", "excludeData": "", "autoCreateBuckets": True,
                                "autoRemoveCollections": True, "forceUpdates": True}}
-        tenant_id, project_id, _ = self.get_tenant_id(), self.get_project_id(
-            project_name), self.get_cluster_id(cluster_name=cluster_name)
-        bucket_id = self.get_backups(cluster_name=cluster_name, project_name=project_name, bucket_name=bucket_name)
+        bucket_id = self.get_backups(tenant_id=tenant_id, project_id=project_id, cluster_id=cluster_id,
+                                     bucket_name=bucket_name)
         url = r"{}/v2/organizations/{}/projects/{}/clusters/{}/buckets/{}/restore" \
             .format(self.internal_url, tenant_id, project_id, cluster_id, bucket_id)
         capella_header = self.get_authorization_internal()
@@ -533,16 +532,15 @@ class CapellaAPI(CapellaAPIRequests):
             if cluster['name'] == cluster_name:
                 return cluster
 
-    def get_backups(self, cluster_name, project_name, bucket_name):
+    def get_backups(self, tenant_id, project_id, cluster_id, bucket_name):
         """
         method to obtain a list of the current backups from backups tab
-        :param cluster_name:
-        :param project_name:
+        :param tenant_id:
+        :param project_id:
+        :param cluster_id:
         :param bucket_name:
         :return: response object
         """
-        tenant_id, project_id, cluster_id = self.get_tenant_id(), self.get_project_id(
-            project_name), self.get_cluster_id(cluster_name=cluster_name)
         capella_header = self.get_authorization_internal()
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}/backups".format(self.internal_url, tenant_id,
                                                                               project_id, cluster_id)
@@ -551,16 +549,15 @@ class CapellaAPI(CapellaAPIRequests):
             if bucket['data']['bucket'] == bucket_name:
                 return bucket['data']['bucketId']
 
-    def backup_now(self, cluster_name, project_name, bucket_name):
+    def backup_now(self, tenant_id, project_id, cluster_id, bucket_name):
         """
         method to trigger an on-demand backup
-        :param cluster_name:
-        :param project_name:
+        :param tenant_id:
+        :param project_id:
+        :param cluster_id:
         :param bucket_name:
         :return: response object
         """
-        tenant_id, project_id, cluster_id = self.get_tenant_id(), self.get_project_id(
-            project_name), self.get_cluster_id(cluster_name=cluster_name)
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}/backup".format(self.internal_url, tenant_id,
                                                                              project_id, cluster_id)
         payload = {"bucket": bucket_name}
