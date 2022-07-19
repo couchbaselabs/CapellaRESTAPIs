@@ -1,12 +1,2 @@
-from .CapellaExceptions import (
-    MissingAccessKeyError,
-    MissingSecretKeyError,
-    MissingBaseURLError,
-    AllowlistRuleError,
-    UserBucketAccessListError,
-    InvalidUuidError,
-    GenericHTTPError,
-    CbcAPIError
-)
-from .CapellaAPIAuth import CapellaAPIAuth
-from .CapellaAPIRequests import CapellaAPIRequests
+# This makes Python treat this directory as containing packages.
+# Help ensures relative imports work
