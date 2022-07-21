@@ -10,7 +10,7 @@ from requests.auth import AuthBase
 # Other Libs
 
 # Owned
-from CapellaExceptions import *
+from .CapellaExceptions import *
 import time
 
 
