@@ -5,8 +5,8 @@ import logging
 import pprint
 
 
-from CapellaAPIAuth import CapellaAPIAuth
-from CapellaExceptions import (
+from .CapellaAPIAuth import CapellaAPIAuth
+from .CapellaExceptions import (
     MissingAccessKeyError,
     MissingSecretKeyError,
     GenericHTTPError,
