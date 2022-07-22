@@ -32,8 +32,9 @@ class CapellaAPI(CapellaAPIRequests):
         }
         return cbc_api_request_headers
 
-    def do_internal_request(self, url, method, params=''):
+    def do_internal_request(self, url, method, params='', headers={}):
         capella_header = self.get_authorization_internal()
+        capella_header.update(headers)
         resp = self._urllib_request(url, method, params=params, headers=capella_header)
         if resp.status_code == 401:
             self.jwt = None
@@ -532,9 +533,9 @@ class CapellaAPI(CapellaAPIRequests):
         user_id = resp.json()["userId"]
         ```
         """
-        capella_header = self.get_authorization_internal()
+        headers = {}
         if bypass_token:
-            capella_header["Vnd-project-Avengers-com-e2e"] = bypass_token
+            headers["Vnd-project-Avengers-com-e2e"] = bypass_token
         url = "{}/invitations".format(self.internal_url)
         body = {
             "tenantId": tenant_id,
@@ -542,9 +543,9 @@ class CapellaAPI(CapellaAPIRequests):
             "name": email,
             "actions": ["READ", "WRITE", "MANAGE"]
         }
-        resp = self._urllib_request(url, method="POST",
+        resp = self.do_internal_request(url, method="POST",
                                     params=json.dumps(body),
-                                    headers=capella_header)
+                                    headers=headers)
         return resp
 
     def verify_email(self, token):
@@ -559,9 +560,8 @@ class CapellaAPI(CapellaAPIRequests):
         jwt = resp.json()["jwt"]
         ```
         """
-        capella_header = self.get_authorization_internal()
         url = "{}/emails/verify/{}".format(self.internal_url, token)
-        resp = self._urllib_request(url, method="POST", headers=capella_header)
+        resp = self.do_internal_request(url, method="POST")
         return resp
 
     def remove_user(self, tenant_id, user_id):
@@ -569,5 +569,5 @@ class CapellaAPI(CapellaAPIRequests):
         Remove a user from the tenant
         """
         url = "{}/tenants/{}/users/{}".format(self.internal_url, tenant_id, user_id)
-        resp = self._urllib_request(url, method="DELETE")
+        resp = self.do_internal_request(url, method="DELETE")
         return resp
