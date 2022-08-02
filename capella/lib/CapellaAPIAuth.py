@@ -3,14 +3,11 @@
 import base64
 import hmac
 import hashlib
-import datetime
-import os
 from requests.auth import AuthBase
 
 # Other Libs
 
 # Owned
-from .CapellaExceptions import *
 import time
 
 

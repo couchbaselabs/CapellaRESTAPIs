@@ -12,10 +12,13 @@ from .CapellaExceptions import (
     GenericHTTPError,
     CbcAPIError
 )
+import base64
+import json
+
 
 class CapellaAPIRequests(object):
 
-    def __init__(self, url, secret, access):
+    def __init__(self, url, secret=None, access=None):
         # handles http requests - GET , PUT, POST, DELETE
         # to the Couchbase Cloud APIs
         # Read the values from the environmental variables
@@ -28,9 +31,34 @@ class CapellaAPIRequests(object):
         # We will re-use the first session we setup to avoid
         # the overhead of creating new sessions for each request
         self.network_session = requests.Session()
+        self.jwt = None
 
     def set_logging_level(self, level):
         self._log.setLevel(level)
+
+    def get_authorization_internal(self):
+        if self.jwt is None:
+            self._log.debug("refreshing token")
+            basic = base64.b64encode('{}:{}'.format(self.user, self.pwd).encode()).decode()
+            header = {'Authorization': 'Basic %s' % basic}
+            resp = self._urllib_request(
+                "{}/sessions".format(self.internal_url), method="POST",
+                headers=header)
+            self.jwt = json.loads(resp.content).get("jwt")
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.jwt,
+           'Content-Type': 'application/json'
+        }
+        return cbc_api_request_headers
+
+    def do_internal_request(self, url, method, params='', headers={}):
+        capella_header = self.get_authorization_internal()
+        capella_header.update(headers)
+        resp = self._urllib_request(url, method, params=params, headers=capella_header)
+        if resp.status_code == 401:
+            self.jwt = None
+            return self.do_internal_request(url, method, params)
+        return resp
 
     # Methods
     def capella_api_get(self, api_endpoint, params=None):

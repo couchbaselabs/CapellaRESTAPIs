@@ -2,9 +2,9 @@
 # Generic/Built-in
 import logging
 
-from .CapellaAPIRequests import CapellaAPIRequests
 import json
-import base64
+from ..lib.CapellaAPIRequests import CapellaAPIRequests
+
 
 class CapellaAPI(CapellaAPIRequests):
 
@@ -15,31 +15,6 @@ class CapellaAPI(CapellaAPIRequests):
         self.internal_url = url.replace("cloud", "", 1)
         self._log = logging.getLogger(__name__)
         self.perPage = 100
-        self.jwt = None
-
-    def get_authorization_internal(self):
-        if self.jwt is None:
-            self._log.debug("refreshing token")
-            basic = base64.b64encode('{}:{}'.format(self.user, self.pwd).encode()).decode()
-            header = {'Authorization': 'Basic %s' % basic}
-            resp = self._urllib_request(
-                "{}/sessions".format(self.internal_url), method="POST",
-                headers=header)
-            self.jwt = json.loads(resp.content).get("jwt")
-        cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.jwt,
-           'Content-Type': 'application/json'
-        }
-        return cbc_api_request_headers
-
-    def do_internal_request(self, url, method, params='', headers={}):
-        capella_header = self.get_authorization_internal()
-        capella_header.update(headers)
-        resp = self._urllib_request(url, method, params=params, headers=capella_header)
-        if resp.status_code == 401:
-            self.jwt = None
-            return self.do_internal_request(url, method, params)
-        return resp
 
     def set_logging_level(self, level):
         self._log.setLevel(level)
