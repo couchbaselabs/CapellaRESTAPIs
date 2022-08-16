@@ -7,7 +7,7 @@ from ..lib.CapellaAPIRequests import CapellaAPIRequests
 
 
 class CapellaAPI(CapellaAPIRequests):
-    def __init__(self, url, username, password, TOKEN_FOR_INTERNAL_SUPPORT):
+    def __init__(self, url, username, password, TOKEN_FOR_INTERNAL_SUPPORT=None):
         super(CapellaAPI, self).__init__(url)
         self.url = url
         self.internal_url = url.replace("cloud", "", 1)
@@ -57,16 +57,30 @@ class CapellaAPI(CapellaAPIRequests):
         return resp
 
     def add_ip_allowlists(self, tenant_id, database_id, project_id, config):
+        # This to to add the list of IPs provided in config for whitelisting
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}/allowlists-bulk" \
             .format(self.internal_url, tenant_id, project_id, database_id)
         resp = self.do_internal_request(url, method="POST", params=json.dumps(config))
+        return resp
+
+    def allow_my_ip(self, tenant_id, project_id, cluster_id):
+        # This is to white-list the IP of the machine where the code is running.
+        url = '{}/v2/organizations/{}/projects/{}/clusters/{}'\
+            .format(self.internal_url, tenant_id, project_id, cluster_id)
+        resp = self._urllib_request("https://ifconfig.me", method="GET")
+        if resp.status_code != 200:
+            raise Exception("Fetch public IP failed!")
+        body = {"cidr": "{}/32".format(resp.content.decode())}
+        url = '{}/allowlists'.format(url)
+        resp = self.do_internal_request(url, method="POST",
+                                        params=json.dumps(body))
         return resp
 
     def generate_keys(self, tenant_id, project_id, database_id):
         url = "{}/v2/organizations/{}/projects/{}/databases/{}/keys" \
             .format(self.internal_url, tenant_id, project_id, database_id)
         body = {}
-        resp = self.do_internal_request(url, params=json.dumps(body), method="POST")
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(body))
         return resp
 
     def delete_database(self, tenant_id, project_id, database_id):
