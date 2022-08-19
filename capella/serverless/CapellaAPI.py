@@ -50,6 +50,17 @@ class CapellaAPI(CapellaAPIRequests):
         resp = self.do_internal_request(url, method="GET")
         return resp
 
+    def get_database_debug_info(self, database_id):
+        url = "{}//internal/support/serverless-databases/{}".format(
+            self.internal_url, database_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
+
     def list_all_databases(self, tenant_id, project_id):
         url = "{}/v2/organizations/{}/projects/{}/clusters?page=1&perPage={}" \
             .format(self.internal_url, tenant_id, project_id, self.perPage)
@@ -91,6 +102,28 @@ class CapellaAPI(CapellaAPIRequests):
 
     def delete_dataplane(self, dataplane_id):
         url = "{}/internal/support/serverless-dataplanes/{}" \
+            .format(self.internal_url, dataplane_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "DELETE",
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def pause_db(self, dataplane_id):
+        url = "{}/internal/support/serverless-hibernation/{}/pause" \
+            .format(self.internal_url, dataplane_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "DELETE",
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def resume_db(self, dataplane_id):
+        url = "{}/internal/support/serverless-hibernation/{}/resume" \
             .format(self.internal_url, dataplane_id)
         cbc_api_request_headers = {
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
