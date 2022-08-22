@@ -111,9 +111,9 @@ class CapellaAPI(CapellaAPIRequests):
                                     headers=cbc_api_request_headers)
         return resp
 
-    def pause_db(self, dataplane_id):
+    def pause_db(self, database_id):
         url = "{}/internal/support/serverless-hibernation/{}/pause" \
-            .format(self.internal_url, dataplane_id)
+            .format(self.internal_url, database_id)
         cbc_api_request_headers = {
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
            'Content-Type': 'application/json'
@@ -122,9 +122,9 @@ class CapellaAPI(CapellaAPIRequests):
                                     headers=cbc_api_request_headers)
         return resp
 
-    def resume_db(self, dataplane_id):
+    def resume_db(self, database_id):
         url = "{}/internal/support/serverless-hibernation/{}/resume" \
-            .format(self.internal_url, dataplane_id)
+            .format(self.internal_url, database_id)
         cbc_api_request_headers = {
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
            'Content-Type': 'application/json'
