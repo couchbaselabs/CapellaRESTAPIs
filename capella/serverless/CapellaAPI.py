@@ -140,8 +140,13 @@ class CapellaAPI(CapellaAPIRequests):
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
            'Content-Type': 'application/json'
         }
+        resp = self._urllib_request("https://ifconfig.me", method="GET")
+        if resp.status_code != 200:
+            raise Exception("Fetch public IP failed!")
+        body = {"allowCIDR": "{}/32".format(resp.content.decode())}
         resp = self._urllib_request(url, "POST",
-                                    headers=cbc_api_request_headers)
+                                    headers=cbc_api_request_headers,
+                                    params=json.dumps(body))
         return resp
 
     def get_serverless_database_debugInfo(self, database_id):
