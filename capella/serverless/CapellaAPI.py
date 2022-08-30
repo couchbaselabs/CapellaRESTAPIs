@@ -150,7 +150,7 @@ class CapellaAPI(CapellaAPIRequests):
         return resp
 
     def get_serverless_database_debugInfo(self, database_id):
-        url = "{}/internal/support/serverless-dataplanes/{}" \
+        url = "{}/internal/support/serverless-databases/{}" \
             .format(self.internal_url, database_id)
         cbc_api_request_headers = {
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
