@@ -3,12 +3,13 @@
 import logging
 
 import json
-from ..lib.CapellaAPIRequests import CapellaAPIRequests
+
+from capella.common.CapellaAPI import CommonCapellaAPI
 
 
-class CapellaAPI(CapellaAPIRequests):
+class CapellaAPI(CommonCapellaAPI):
     def __init__(self, url, username, password, TOKEN_FOR_INTERNAL_SUPPORT=None):
-        super(CapellaAPI, self).__init__(url)
+        super(CapellaAPI, self).__init__(url, None, None, username, password)
         self.url = url
         self.internal_url = url.replace("cloud", "", 1)
 

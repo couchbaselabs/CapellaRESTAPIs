@@ -3,18 +3,11 @@
 import logging
 
 import json
-from ..lib.CapellaAPIRequests import CapellaAPIRequests
+
+from capella.common.CapellaAPI import CommonCapellaAPI
 
 
-class CapellaAPI(CapellaAPIRequests):
-
-    def __init__(self, url, secret, access, user, pwd):
-        super(CapellaAPI, self).__init__(url, secret, access)
-        self.user = user
-        self.pwd = pwd
-        self.internal_url = url.replace("cloud", "", 1)
-        self._log = logging.getLogger(__name__)
-        self.perPage = 100
+class CapellaAPI(CommonCapellaAPI):
 
     def set_logging_level(self, level):
         self._log.setLevel(level)

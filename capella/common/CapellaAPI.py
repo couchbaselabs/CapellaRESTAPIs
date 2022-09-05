@@ -59,3 +59,11 @@ class CommonCapellaAPI(CapellaAPIRequests):
         url = "{}/emails/verify/{}".format(self.internal_url, token)
         resp = self.do_internal_request(url, method="POST")
         return resp
+
+    def list_accessible_tenants(self):
+        """
+        List tenants that are accessible to the user
+        """
+        url = "{}/tenants".format(self.internal_url)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
