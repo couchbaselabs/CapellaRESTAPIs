@@ -61,6 +61,27 @@ class CapellaAPI(CapellaAPIRequests):
                                     headers=cbc_api_request_headers)
         return resp
 
+    def update_database(self, database_id, override):
+        """
+        Update serverless database. Example override:
+        {
+            "overRide": {
+                "width": 2,
+                "weight": 60
+            }
+        }
+        """
+        url = "{}/internal/support/serverless-databases/{}" \
+              .format(self.internal_url, database_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "PUT",
+                                    headers=cbc_api_request_headers,
+                                    params=json.dumps(override))
+        return resp
+
     def list_all_databases(self, tenant_id, project_id):
         url = "{}/v2/organizations/{}/projects/{}/clusters?page=1&perPage={}" \
             .format(self.internal_url, tenant_id, project_id, self.perPage)
