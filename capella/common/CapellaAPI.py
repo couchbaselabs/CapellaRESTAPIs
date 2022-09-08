@@ -43,3 +43,19 @@ class CommonCapellaAPI(CapellaAPIRequests):
                                         params=json.dumps(body),
                                         headers=headers)
         return resp
+
+    def verify_email(self, token):
+        """
+        Verify an email invitation.
+
+        Example use:
+
+        ```
+        token = "email-verify-token"
+        resp = client.verify_email(token)
+        jwt = resp.json()["jwt"]
+        ```
+        """
+        url = "{}/emails/verify/{}".format(self.internal_url, token)
+        resp = self.do_internal_request(url, method="POST")
+        return resp
