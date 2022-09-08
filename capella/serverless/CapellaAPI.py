@@ -24,7 +24,7 @@ class CapellaAPI(CapellaAPIRequests):
            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
            'Content-Type': 'application/json'
         }
-        resp = self._urllib_request(url, "POST", params=config,
+        resp = self._urllib_request(url, "POST", params=json.dumps(config),
                                     headers=cbc_api_request_headers)
         return resp
 
