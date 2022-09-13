@@ -192,3 +192,14 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
         return resp
+
+    def get_serverless_dataplane_node_configs(self, dataplane_id):
+        url = "{}/internal/support/serverless-dataplanes/{}/node-configs" \
+            .format(self.internal_url, dataplane_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
