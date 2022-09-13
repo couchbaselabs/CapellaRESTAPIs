@@ -44,6 +44,17 @@ class CapellaAPI(CapellaAPIRequests):
         resp = self.do_internal_request(url, method="POST", params=json.dumps(config))
         return resp
 
+    def create_serverless_database_overRide(self, config):
+        url = "{}/internal/support/serverless-databases".format(
+            self.internal_url)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "POST", params=json.dumps(config),
+                                    headers=cbc_api_request_headers)
+        return resp
+
     def get_serverless_db_info(self, tenant_id, project_id, database_id):
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}".format(
             self.internal_url, tenant_id, project_id, database_id)
