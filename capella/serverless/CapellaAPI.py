@@ -4,7 +4,7 @@ import logging
 
 import json
 
-from capella.common.CapellaAPI import CommonCapellaAPI
+from ..common.CapellaAPI import CommonCapellaAPI
 
 
 class CapellaAPI(CommonCapellaAPI):
