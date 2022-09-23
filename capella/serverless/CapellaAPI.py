@@ -56,6 +56,28 @@ class CapellaAPI(CommonCapellaAPI):
                                     headers=cbc_api_request_headers)
         return resp
 
+    def update_serverless_database(self, database_id, config):
+        url = "{}/internal/support/serverless-databases/{}".format(
+            self.internal_url, database_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "PUT", params=json.dumps(config),
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def reweight_dataplane(self, dataplane_id):
+        url = "{}/internal/support/serverless-databases/{}/reweight".format(
+            self.internal_url, dataplane_id)
+        cbc_api_request_headers = {
+           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+           'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "POST", params=json.dumps({}),
+                                    headers=cbc_api_request_headers)
+        return resp
+
     def get_serverless_db_info(self, tenant_id, project_id, database_id):
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}".format(
             self.internal_url, tenant_id, project_id, database_id)
