@@ -95,6 +95,28 @@ class CapellaAPI(CommonCapellaAPI):
                                     headers=cbc_api_request_headers)
         return resp
 
+    def delete_serverless_database(self, database_id):
+        url = "{}//internal/support/serverless-databases/{}".format(
+            self.internal_url, database_id)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "DELETE",
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def get_all_serverless_databases(self):
+        url = "{}//internal/support/serverless-databases".format(
+            self.internal_url)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
+
     def update_database(self, database_id, override):
         """
         Update serverless database. Example override:
@@ -163,6 +185,17 @@ class CapellaAPI(CommonCapellaAPI):
            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "DELETE",
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def get_all_dataplanes(self):
+        url = "{}/internal/support/serverless-dataplanes" \
+            .format(self.internal_url)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
         return resp
 
