@@ -67,3 +67,15 @@ class CommonCapellaAPI(CapellaAPIRequests):
         url = "{}/tenants".format(self.internal_url)
         resp = self.do_internal_request(url, method="GET")
         return resp
+
+    def create_access_secret_key(self, name, tenant_id):
+        headers = {}
+        url = "{}/tokens?tenantId={}".format(self.internal_url, tenant_id)
+        body = {
+            "name": name,
+            "tenantId": tenant_id
+        }
+        resp = self.do_internal_request(url, method="POST",
+                                        params=json.dumps(body),
+                                        headers=headers)
+        return resp
