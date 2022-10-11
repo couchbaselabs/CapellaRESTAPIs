@@ -269,3 +269,14 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
         return resp
+
+    def get_serverless_current_relaeased_ami(self):
+        url = "{}/internal/support/serverless-dataplanes/current-release" \
+            .format(self.internal_url)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
