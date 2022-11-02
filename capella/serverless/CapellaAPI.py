@@ -3,7 +3,7 @@
 import logging
 
 import json
-
+import subprocess
 from ..common.CapellaAPI import CommonCapellaAPI
 
 
@@ -22,8 +22,8 @@ class CapellaAPI(CommonCapellaAPI):
     def create_serverless_dataplane(self, config):
         url = "{}/internal/support/serverless-dataplanes".format(self.internal_url)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "POST", params=json.dumps(config),
                                     headers=cbc_api_request_headers)
@@ -33,8 +33,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-dataplanes/{}".format(
             self.internal_url, dataplane_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
@@ -49,8 +49,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-databases".format(
             self.internal_url)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "POST", params=json.dumps(config),
                                     headers=cbc_api_request_headers)
@@ -60,8 +60,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-databases/{}".format(
             self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "PUT", params=json.dumps(config),
                                     headers=cbc_api_request_headers)
@@ -71,8 +71,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-databases/{}/reweight".format(
             self.internal_url, dataplane_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "POST", params=json.dumps({}),
                                     headers=cbc_api_request_headers)
@@ -88,8 +88,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}//internal/support/serverless-databases/{}".format(
             self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
@@ -117,6 +117,18 @@ class CapellaAPI(CommonCapellaAPI):
                                     headers=cbc_api_request_headers)
         return resp
 
+        def get_all_databases_id(self):
+            url = "{}//internal/support/serverless-databases".format(
+                self.internal_url)
+
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
+
     def update_database(self, database_id, override):
         """
         Update serverless database. Example override:
@@ -127,15 +139,16 @@ class CapellaAPI(CommonCapellaAPI):
             }
         }
         """
+        override_obj = {"overRide": override}
         url = "{}/internal/support/serverless-databases/{}" \
-              .format(self.internal_url, database_id)
+            .format(self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "PUT",
                                     headers=cbc_api_request_headers,
-                                    params=json.dumps(override))
+                                    params=json.dumps(override_obj))
         return resp
 
     def list_all_databases(self, tenant_id, project_id):
@@ -153,7 +166,7 @@ class CapellaAPI(CommonCapellaAPI):
 
     def allow_my_ip(self, tenant_id, project_id, cluster_id):
         # This is to white-list the IP of the machine where the code is running.
-        url = '{}/v2/organizations/{}/projects/{}/clusters/{}'\
+        url = '{}/v2/organizations/{}/projects/{}/clusters/{}' \
             .format(self.internal_url, tenant_id, project_id, cluster_id)
         resp = self._urllib_request("https://ifconfig.me", method="GET")
         if resp.status_code != 200:
@@ -181,8 +194,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-dataplanes/{}" \
             .format(self.internal_url, dataplane_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "DELETE",
                                     headers=cbc_api_request_headers)
@@ -203,8 +216,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-hibernation/{}/pause" \
             .format(self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "POST",
                                     headers=cbc_api_request_headers)
@@ -214,8 +227,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-hibernation/{}/resume" \
             .format(self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "POST",
                                     headers=cbc_api_request_headers)
@@ -225,8 +238,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-dataplanes/{}/bypass" \
             .format(self.internal_url, dataplane_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request("https://ifconfig.me", method="GET")
         if resp.status_code != 200:
@@ -241,8 +254,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-databases/{}" \
             .format(self.internal_url, database_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
@@ -252,8 +265,8 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-dataplanes/{}/node-configs" \
             .format(self.internal_url, dataplane_id)
         cbc_api_request_headers = {
-           'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
-           'Content-Type': 'application/json'
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
         }
         resp = self._urllib_request(url, "GET",
                                     headers=cbc_api_request_headers)
@@ -273,6 +286,41 @@ class CapellaAPI(CommonCapellaAPI):
     def get_serverless_current_relaeased_ami(self):
         url = "{}/internal/support/serverless-dataplanes/current-release" \
             .format(self.internal_url)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        return resp
+
+    def get_fts_nodes_of_dataplane(self, dataplane_id):
+        url = "{}/internal/support/serverless-dataplanes/{}/info" \
+            .format(self.internal_url, dataplane_id)
+        cbc_api_request_headers = {
+            'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
+            'Content-Type': 'application/json'
+        }
+        resp = self._urllib_request(url, "GET",
+                                    headers=cbc_api_request_headers)
+        info_nodes = resp.json()['couchbase']['nodes']
+        fts_hostname = []
+        for node in info_nodes:
+            if node['services'][0]['type'] == 'fts':
+                fts_hostname.append(node['hostname'])
+        return fts_hostname
+
+    def get_fts_autoscaling_stats(self, dp_id):
+        fts_nodes = self.get_fts_nodes_of_dataplane(dp_id)
+        creds = self.get_access_to_serverless_dataplane_nodes(dp_id).json()
+        for count, node in enumerate(fts_nodes):
+            CurlUrl = f"""curl -s -XGET https://{fts_nodes[count]}:18094/api/nsstats -u {creds['couchbaseCreds']['username']}:{creds['couchbaseCreds']['password']} --insecure | jq | grep -E "util|resource|limits" """
+            resp = subprocess.getstatusoutput(CurlUrl)
+            print(f"STATS for FTS Node{count + 1}. {fts_nodes[count]} : \n {resp[1]}")
+
+    def get_all_databases_id(self):
+        url = "{}//internal/support/serverless-databases".format(
+            self.internal_url)
         cbc_api_request_headers = {
             'Authorization': 'Bearer %s' % self.TOKEN_FOR_INTERNAL_SUPPORT,
             'Content-Type': 'application/json'
