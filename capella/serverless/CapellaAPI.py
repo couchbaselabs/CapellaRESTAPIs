@@ -154,7 +154,7 @@ class CapellaAPI(CommonCapellaAPI):
         return resp
 
     def pause_db(self, database_id):
-        url = "{}/internal/support/serverless-hibernation/{}/pause" \
+        url = "{}/internal/support/serverless-database-hibernation/{}/pause" \
             .format(self.internal_url, database_id)
         resp = self._urllib_request(url, "POST", params='',
                                         headers=self.cbc_api_request_headers)
