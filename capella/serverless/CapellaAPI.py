@@ -157,13 +157,14 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/serverless-database-hibernation/{}/pause" \
             .format(self.internal_url, database_id)
         resp = self._urllib_request(url, "POST", params='',
-                                        headers=self.cbc_api_request_headers)
+                                    headers=self.cbc_api_request_headers)
         return resp
 
     def resume_db(self, database_id):
-        url = "{}/internal/support/serverless-hibernation/{}/resume" \
+        url = "{}/internal/support/serverless-database-hibernation/{}/resume" \
             .format(self.internal_url, database_id)
-        resp = self.request(url, "POST")
+        resp = self._urllib_request(url, "POST", params='',
+                                    headers=self.cbc_api_request_headers)
         return resp
 
     def get_access_to_serverless_dataplane_nodes(self, dataplane_id, ip = None):

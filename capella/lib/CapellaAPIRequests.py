@@ -196,8 +196,6 @@ class CapellaAPIRequests(object):
     def _urllib_request(self, api, method='GET', headers=None,
                         params='', timeout=300, verify=False):
         session = requests.Session()
-        print("API: " + api)
-        print("Headers: " + str(headers))
         try:
             if method == "GET":
                 resp = session.get(api, params=params, headers=headers,
