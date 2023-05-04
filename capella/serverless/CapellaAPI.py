@@ -64,7 +64,6 @@ class CapellaAPI(CommonCapellaAPI):
     def get_serverless_db_info(self, tenant_id, project_id, database_id):
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}".format(
             self.internal_url, tenant_id, project_id, database_id)
-        print(url)
         resp = self.do_internal_request(url, method="GET")
         return resp
 

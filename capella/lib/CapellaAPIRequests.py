@@ -60,8 +60,6 @@ class CapellaAPIRequests(object):
     def do_internal_request(self, url, method, params='', headers={}):
         capella_header = self.get_authorization_internal()
         capella_header.update(headers)
-        print(url)
-        print(capella_header)
         resp = self._urllib_request(url, method, params=params, headers=capella_header)
         if resp.status_code == 401:
             self.jwt = None
