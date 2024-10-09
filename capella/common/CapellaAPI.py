@@ -108,7 +108,9 @@ class CommonCapellaAPI(APIRequests):
             "tenant": tenant_name,
             "email": email,
             "name": full_name,
-            "password": password
+            "password": password,
+            "termsOfServiceAccepted": True,
+            "marketingOptIn": False
         }
         resp = self._urllib_request(url, method="POST",
                                     params=json.dumps(body),
