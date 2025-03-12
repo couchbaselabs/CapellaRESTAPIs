@@ -921,6 +921,16 @@ class CapellaAPI(CommonCapellaAPI):
                                         params=json.dumps(config))
         return resp
 
+    def create_sgw_backend_specific_version(self, config):
+        """
+        Create a SyncGateway backend (app services) for a cluster with a specific version
+        """
+        url = "{}/internal/support/app-services/deploy-specific-version/"
+        resp = self._urllib_request(url, method="POST",
+                                    params=json.dumps(config),
+                                    headers=self.cbc_api_request_headers)
+        return resp
+
     def get_sgw_backend(self, tenant_id, project_id, cluster_id, backend_id):
         """
         Get details about a SyncGateway backend for a cluster
