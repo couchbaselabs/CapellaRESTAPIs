@@ -1937,12 +1937,10 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self.do_internal_request(url, method="GET")
         return resp
 
-    def get_query_workload_stats(self, tenant_id, project_id, cluster_id, **kwargs):
+    def get_query_workload_stats(self, tenant_id, project_id, cluster_id, payload):
         url = "{}/v2/organizations/{}/projects/{}/clusters/{}/query-workload-stats".format(
             self.internal_url, tenant_id, project_id, cluster_id)
-        query_params = "&".join("{}={}".format(k, v) for k, v in kwargs.items())
-        url = "{}?{}".format(url, query_params)
-        resp = self.do_internal_request(url, method="GET")
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
         return resp
 
     def get_query_workload_filters(self, tenant_id, project_id, cluster_id, **kwargs):
