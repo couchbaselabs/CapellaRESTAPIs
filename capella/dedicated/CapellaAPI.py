@@ -2234,3 +2234,39 @@ class CapellaAPI(CommonCapellaAPI):
         )
         resp = self.do_internal_request(url, method="DELETE")
         return resp
+
+    def start_ondemand_cluster_backup(self, tenant_id, project_id, cluster_id, retention_hours):
+        """Start a new backup snapshot."""
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups".format(
+            self.internal_url,
+            tenant_id,
+            project_id,
+            cluster_id,
+        )
+        payload = {"retention": retention_hours}
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
+        return resp
+
+    def restore_cluster_backup(self, tenant_id, project_id, cluster_id, backup_id):
+        """Restore the cluster using an existing backup snapshot."""
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups/{}/restore".format(
+            self.internal_url, tenant_id, project_id, cluster_id, backup_id
+        )
+        resp = self.do_internal_request(url, method="POST")
+        return resp
+
+    def list_cluster_backups(self, tenant_id, project_id, cluster_id, page, per_page):
+        """List all cluster level backups on the specified cluster."""
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups?page={}&perPage={}".format(
+            self.internal_url, tenant_id, project_id, cluster_id, page, per_page
+        )
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def list_cluster_restores(self, tenant_id, project_id, cluster_id, page, per_page):
+        """List all cluster level restores that have taken place on a specified cluster."""
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups/restores?page={}&perPage={}".format(
+            self.internal_url, tenant_id, project_id, cluster_id, page, per_page
+        )
+        resp = self.do_internal_request(url, method="GET")
+        return resp
