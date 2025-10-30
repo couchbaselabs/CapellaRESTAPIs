@@ -2244,3 +2244,29 @@ class CapellaAPI(CommonCapellaAPI):
         )
         resp = self.do_internal_request(url, method="DELETE")
         return resp
+
+    def enable_fusion(self, tenant_id, project_id, cluster_id):
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/enable".format(
+            self.internal_url, tenant_id, project_id, cluster_id
+        )
+        resp = self.do_internal_request(url, method="POST")
+        return resp
+
+    def disable_fusion(self, tenant_id, project_id, cluster_id):
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/disable".format(
+            self.internal_url, tenant_id, project_id, cluster_id
+        )
+        resp = self.do_internal_request(url, method="POST")
+        return resp
+
+    def stop_fusion(self, tenant_id, project_id, cluster_id):
+        url="{}/internal/support/clusters/{}/fusion/stop".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, "POST",
+                                    headers=self.cbc_api_request_headers)
+        return resp
+
+    def get_fusion_status(self, tenant_id, project_id, cluster_id):
+        url="{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, "GET",
+                                    headers=self.cbc_api_request_headers)
+        return resp
