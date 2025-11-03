@@ -652,3 +652,45 @@ class CapellaAPI(CommonCapellaAPI):
             self.internal_url, tenant_id, project_id, instance_id, job_id)
         resp = self.do_internal_request(url, method="GET")
         return resp
+
+    def get_trustauth_template(self, tenant_id, project_id, instance_id):
+        """
+            Fetches the trust authentication template for the specified columnar instance.
+            Parameters:
+                tenant_id (str): The ID of the tenant associated with the project.
+                project_id (str): The ID of the project where the instance is located.
+                instance_id (str): The ID of the Columnar instance.
+        """
+        url = '{}/v2/organizations/{}/projects/{}/instance/{}/trustauth/template' \
+            .format(self.internal_url, tenant_id, project_id, instance_id)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def get_dp_agent_hash(self, cluster_id):
+        """
+            Fetches the dp-agent hash for the specified columnar instance.
+            Parameters:
+                cluster_id (str): Cluster ID of the columnar instance.
+        """
+        url = '{}/internal/support/clusters/{}/agent-versions' \
+            .format(self.internal_url, cluster_id)
+        headers = {
+            "Authorization": f"Bearer {self.TOKEN_FOR_INTERNAL_SUPPORT}"
+        }
+        resp = self.do_internal_request(url, method="GET", headers=headers)
+        return resp
+
+    def update_dp_agent(self, cluster_id, hash):
+        """
+            Updates the dp-agent hash for the specified columnar instance.
+            Parameters:
+                cluster_id (str): Cluster ID of the columnar instance.
+                hash (str): The hash of the dp-agent to update.
+        """
+        url = '{}/internal/support/clusters/{}/agent-versions/activate' \
+            .format(self.internal_url, cluster_id)
+        headers = {
+            "Authorization": f"Bearer {self.TOKEN_FOR_INTERNAL_SUPPORT}"
+        }
+        resp = self.do_internal_request(url, method="POST", params=json.dumps({"hash": hash}), headers=headers)
+        return resp
