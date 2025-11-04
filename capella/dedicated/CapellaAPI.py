@@ -1971,25 +1971,6 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self.do_internal_request(url, method="GET")
         return resp
 
-    def enable_fusion(self, cluster_id, sync_threshold = 102400):
-        url = "{}/internal/support/clusters/{}/fusion/enable".format(self.internal_url, cluster_id)
-        data = {
-            "logStoreURI": "s3://cbc-storage-{}".format(cluster_id[-6:]),
-            "enableSyncThresholdMB": sync_threshold
-        }
-        resp = self._urllib_request(url, method="POST", params=json.dumps(data), headers=self.cbc_api_request_headers)
-        return resp
-
-    def disable_fusion(self, cluster_id):
-        url = "{}/internal/support/clusters/{}/fusion/disable".format(self.internal_url, cluster_id)
-        resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers)
-        return resp
-
-    def get_fusion_status(self, cluster_id):
-        url = "{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
-        resp = self._urllib_request(url, method="GET", headers=self.cbc_api_request_headers)
-        return resp
-
     def get_mtls_configuration(self, tenant_id, project_id, cluster_id):
         """
         Get the mTLS configuration for the cluster.
@@ -2260,13 +2241,35 @@ class CapellaAPI(CommonCapellaAPI):
         return resp
 
     def stop_fusion(self, tenant_id, project_id, cluster_id):
-        url="{}/internal/support/clusters/{}/fusion/stop".format(self.internal_url, cluster_id)
-        resp = self._urllib_request(url, "POST",
-                                    headers=self.cbc_api_request_headers)
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/stop".format(
+            self.internal_url, tenant_id, project_id, cluster_id
+        )
+        resp = self.do_internal_request(url, method="POST")
         return resp
 
-    def get_fusion_status(self, tenant_id, project_id, cluster_id):
-        url="{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
-        resp = self._urllib_request(url, "GET",
-                                    headers=self.cbc_api_request_headers)
+    def fusion_list(self, tenant_id, project_id, cluster_id):
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/list".format(
+            self.internal_url, tenant_id, project_id, cluster_id
+        )
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def enable_fusion_internal(self, cluster_id):
+        url = "{}/internal/support/clusters/{}/fusion/enable".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers)
+        return resp
+
+    def disable_fusion_internal(self, cluster_id):
+        url = "{}/internal/support/clusters/{}/fusion/disable".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers)
+        return resp
+
+    def stop_fusion_internal(self, cluster_id):
+        url="{}/internal/support/clusters/{}/fusion/stop".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers)
+        return resp
+
+    def fusion_status_internal(self, cluster_id):
+        url = "{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
+        resp = self._urllib_request(url, method="GET", headers=self.cbc_api_request_headers)
         return resp
