@@ -3134,7 +3134,7 @@ class ClusterOperationsAPIs(APIRequests):
         if kwargs:
             params = kwargs
         else:
-            params = None
+            params = {}
 
         resp = self.api_post(self.private_network_service_endpoint.format(
             organizationId, projectId, clusterId), params, headers)
