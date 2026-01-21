@@ -2227,28 +2227,28 @@ class CapellaAPI(CommonCapellaAPI):
         return resp
 
     def enable_fusion(self, tenant_id, project_id, cluster_id):
-        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/enable".format(
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/express-scaling/enable".format(
             self.internal_url, tenant_id, project_id, cluster_id
         )
         resp = self.do_internal_request(url, method="POST")
         return resp
 
     def disable_fusion(self, tenant_id, project_id, cluster_id):
-        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/disable".format(
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/express-scaling/disable".format(
             self.internal_url, tenant_id, project_id, cluster_id
         )
         resp = self.do_internal_request(url, method="POST")
         return resp
 
     def stop_fusion(self, tenant_id, project_id, cluster_id):
-        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/stop".format(
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/express-scaling/stop".format(
             self.internal_url, tenant_id, project_id, cluster_id
         )
         resp = self.do_internal_request(url, method="POST")
         return resp
 
     def fusion_list(self, tenant_id, project_id, cluster_id):
-        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/fusion/list".format(
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/express-scaling/list".format(
             self.internal_url, tenant_id, project_id, cluster_id
         )
         resp = self.do_internal_request(url, method="GET")
