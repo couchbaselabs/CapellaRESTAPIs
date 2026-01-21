@@ -80,6 +80,14 @@ class ClusterOperationsAPIs(APIRequests):
         self.free_tier_app_svc_endpoint = self.cluster_endpoint + "/{}/appservices/freeTier"
 
         self.user_endpoint = organization_endpoint + "/{}/users"
+
+        # fusion 2
+        self.express_scaling_endpoint = self.cluster_endpoint + "/{}/expressScaling"
+
+        # appService Log Streaming
+        self.app_svc_log_streaming_endpoint = self.cluster_appservice_api + "logStreaming"
+        self.app_endpoint_log_streaming_endpoint = self.app_endpoints_endpoint + "logStreaming"
+        self.app_svc_log_streaming_pause_resume_endpoint = self.app_svc_log_streaming_endpoint + "/activationState"
     
     def create_user(
             self,
@@ -6332,6 +6340,100 @@ class ClusterOperationsAPIs(APIRequests):
             params, headers)
         return resp
 
+    def get_express_scaling_status(self, organizationId, projectId, clusterId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get("{}/{}".format(
+            self.cluster_endpoint.format(organizationId, projectId),
+            clusterId), params, headers)
+        express_scaling_status = resp.json()["expressScaling"]
+        return express_scaling_status
+
+    def enable_express_scaling(self, organizationId, projectId, clusterId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = {"expressScaling": True}
+        resp = self.api_put(
+            self.express_scaling_endpoint.format(
+                organizationId, projectId, clusterId), params, headers)
+        return resp
+
+    def disable_express_scaling(self, organizationId, projectId, clusterId,
+                               headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = {"expressScaling": False}
+        resp = self.api_put(
+            self.express_scaling_endpoint.format(
+                organizationId, projectId, clusterId), params, headers)
+        return resp
+
+    def create_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_post(
+            self.app_svc_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+        return resp
+
+    def get_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.app_svc_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+        return resp
+
+    def create_app_endpoint_log_streaming(self, organizationId, projectId, clusterId, appServiceId, appEndpointId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_put(
+            self.app_endpoint_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId, appEndpointId), params, headers)
+        return resp
+
+    def get_app_endpoint_log_streaming(self, organizationId, projectId, clusterId, appServiceId, appEndpointId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.app_endpoint_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId, appEndpointId), params, headers)
+        return resp
+
+    def disable_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            self.app_endpoint_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+        return resp
+
+    def pause_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            self.app_svc_log_streaming_pause_resume_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+        return resp
+
+    def resume_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_post(
+            self.app_svc_log_streaming_pause_resume_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+        return resp
 
 class CapellaAPI(CommonCapellaAPI):
 
