@@ -86,7 +86,7 @@ class ClusterOperationsAPIs(APIRequests):
 
         # appService Log Streaming
         self.app_svc_log_streaming_endpoint = self.cluster_appservice_api + "logStreaming"
-        self.app_endpoint_log_streaming_endpoint = self.app_endpoints_endpoint + "logStreaming"
+        self.app_endpoint_log_streaming_endpoint = self.app_endpoints_endpoint + "/{}/logStreaming"
         self.app_svc_log_streaming_pause_resume_endpoint = self.app_svc_log_streaming_endpoint + "/activationState"
     
     def create_user(
@@ -6399,7 +6399,7 @@ class ClusterOperationsAPIs(APIRequests):
             self.app_endpoint_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId, appEndpointId), params, headers)
         return resp
 
-    def get_app_endpoint_log_streaming(self, organizationId, projectId, clusterId, appServiceId, appEndpointId, headers=None, **kwargs):
+    def get_app_endpoint_log_streaming_configuration(self, organizationId, projectId, clusterId, appServiceId, appEndpointId, headers=None, **kwargs):
         if kwargs:
             params = kwargs
         else:
@@ -6414,7 +6414,7 @@ class ClusterOperationsAPIs(APIRequests):
         else:
             params = None
         resp = self.api_del(
-            self.app_endpoint_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
+            self.app_svc_log_streaming_endpoint.format(organizationId, projectId, clusterId, appServiceId), params, headers)
         return resp
 
     def pause_app_service_log_streaming(self, organizationId, projectId, clusterId, appServiceId, headers=None, **kwargs):
