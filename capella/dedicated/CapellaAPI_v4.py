@@ -89,10 +89,12 @@ class ClusterOperationsAPIs(APIRequests):
         self.app_endpoint_log_streaming_endpoint = self.app_endpoints_endpoint + "/{}/logStreaming"
         self.app_svc_log_streaming_pause_resume_endpoint = self.app_svc_log_streaming_endpoint + "/activationState"
 
-        self.billing_organization_endpoint = organization_endpoint + "/{}/billing"
+        self.billing_base_endpoint = organization_endpoint + "/{}/billing"
+        self.billing_get_prepaid_credit_endpoint = self.billing_base_endpoint + "/prePaidCredits"
+        self.billing_categorized_endpoint = self.billing_base_endpoint
         self.billing_itemized_per_cluster_endpoint = self.cluster_endpoint + "/{}/billing"
-        self.billing_pay_as_you_go_endpoint = self.billing_get_prepaid_credit_endpoint + "/payAsYouGo"
-        self.billing_download_categorized_csv_endpoint = organization_endpoint + "/{}/billing/download"
+        self.billing_pay_as_you_go_endpoint = self.billing_base_endpoint + "/payAsYouGo"
+        self.billing_download_categorized_csv_endpoint = self.billing_base_endpoint + "/download"
         self.billing_download_itemized_per_cluster_csv_endpoint = self.cluster_endpoint + "/{}/billing/download"
     
     def create_user(
@@ -6448,7 +6450,7 @@ class ClusterOperationsAPIs(APIRequests):
         else:
             params = None
         resp = self.api_get(
-            self.billing_organization_endpoint.format(organizationId), params, headers)
+            self.billing_get_prepaid_credit_endpoint.format(organizationId), params, headers)
         return resp
 
     def get_categorized_billing(self, organizationId, headers=None, **kwargs):
@@ -6457,7 +6459,7 @@ class ClusterOperationsAPIs(APIRequests):
         else:
             params = None
         resp = self.api_post(
-            self.billing_organization_endpoint.format(organizationId), params, headers)
+            self.billing_categorized_endpoint.format(organizationId), params, headers)
         return resp
 
     def get_itemized_billing_per_cluster(self, organizationId, projectId, clusterId, headers=None, **kwargs):
