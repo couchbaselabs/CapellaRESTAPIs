@@ -1019,7 +1019,7 @@ class CapellaAPI(CommonCapellaAPI):
     def update_sync_function_sgw(self, tenant_id, project_id, cluster_id, backend_id, db_name, config):
         url = '{}/v2/organizations/{}/projects/{}/clusters/{}/backends/{}/databases/{}/sync' \
               .format(self.internal_url, tenant_id, project_id, cluster_id, backend_id, db_name)
-        resp = self.do_internal_request(url, method="POST",
+        resp = self.do_internal_request(url, method="PUT",
                                         params=json.dumps(config))
         return resp
 
