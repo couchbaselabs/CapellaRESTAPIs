@@ -1020,7 +1020,7 @@ class CapellaAPI(CommonCapellaAPI):
         url = '{}/v2/organizations/{}/projects/{}/clusters/{}/backends/{}/databases/{}/sync' \
               .format(self.internal_url, tenant_id, project_id, cluster_id, backend_id, db_name)
         resp = self.do_internal_request(url, method="PUT",
-                                        params=json.dumps(config))
+                                        params=config)
         return resp
 
     def add_app_role_sgw(self, tenant_id, project_id, cluster_id, backend_id, db_name, config):
