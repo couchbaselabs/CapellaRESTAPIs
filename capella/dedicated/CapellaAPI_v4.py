@@ -6489,13 +6489,13 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_download_categorized_csv_endpoint.format(organizationId), params, headers)
         return resp
 
-    def get_download_itemized_per_cluster_csv_billing(self, organizationId, headers=None, **kwargs):
+    def get_download_itemized_per_cluster_csv_billing(self, organizationId, projectId, clusterId, headers=None, **kwargs):
         if kwargs:
             params = kwargs
         else:
             params = None
         resp = self.api_post(
-            self.billing_download_itemized_per_cluster_csv_endpoint.format(organizationId), params, headers)
+            self.billing_download_itemized_per_cluster_csv_endpoint.format(organizationId, projectId, clusterId), params, headers)
         return resp
 
 class CapellaAPI(CommonCapellaAPI):
