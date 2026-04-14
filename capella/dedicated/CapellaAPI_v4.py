@@ -6453,8 +6453,10 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_get_prepaid_credit_endpoint.format(organizationId), params, headers)
         return resp
 
-    def get_categorized_billing(self, organizationId, headers=None, **kwargs):
-        if kwargs:
+    def get_categorized_billing(self, organizationId, body=None, headers=None, **kwargs):
+        if body:
+            params = body
+        elif kwargs:
             params = kwargs
         else:
             params = None
@@ -6462,8 +6464,10 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_categorized_endpoint.format(organizationId), params, headers)
         return resp
 
-    def get_itemized_billing_per_cluster(self, organizationId, projectId, clusterId, headers=None, **kwargs):
-        if kwargs:
+    def get_itemized_billing_per_cluster(self, organizationId, projectId, clusterId, body=None, headers=None, **kwargs):
+        if body:
+            params = body
+        elif kwargs:
             params = kwargs
         else:
             params = None
@@ -6471,8 +6475,10 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_itemized_per_cluster_endpoint.format(organizationId, projectId, clusterId), params, headers)
         return resp
 
-    def get_pay_as_you_go_billing(self, organizationId, headers=None, **kwargs):
-        if kwargs:
+    def get_pay_as_you_go_billing(self, organizationId, body=None, headers=None, **kwargs):
+        if body:
+            params = body
+        elif kwargs:
             params = kwargs
         else:
             params = None
@@ -6480,8 +6486,10 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_pay_as_you_go_endpoint.format(organizationId), params, headers)
         return resp
 
-    def get_download_categorized_csv_billing(self, organizationId, headers=None, **kwargs):
-        if kwargs:
+    def get_download_categorized_csv_billing(self, organizationId, body=None, headers=None, **kwargs):
+        if body:
+            params = body
+        elif kwargs:
             params = kwargs
         else:
             params = None
@@ -6489,8 +6497,10 @@ class ClusterOperationsAPIs(APIRequests):
             self.billing_download_categorized_csv_endpoint.format(organizationId), params, headers)
         return resp
 
-    def get_download_itemized_per_cluster_csv_billing(self, organizationId, projectId, clusterId, headers=None, **kwargs):
-        if kwargs:
+    def get_download_itemized_per_cluster_csv_billing(self, organizationId, projectId, clusterId, body=None, headers=None, **kwargs):
+        if body:
+            params = body
+        elif kwargs:
             params = kwargs
         else:
             params = None
