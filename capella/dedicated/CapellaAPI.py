@@ -588,6 +588,32 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
         return resp
 
+    def restore_from_backup_cross_cluster(self, tenant_id, project_id, source_cluster_id, target_cluster_id, bucket_name, backup_id):
+        """
+        method used to restore from the backup
+        :param tenant_id:
+        :param project_id:
+        :param source_cluster_id:
+        :param target_cluster_id:
+        :param bucket_name:
+        :param backup_id:
+        :return: response object
+        """
+        payload = {"sourceClusterId": source_cluster_id,
+                   "targetClusterId": target_cluster_id,
+                   "backupId": backup_id,
+                   "options": {"services": ["data", "query", "index", "search"], "filterKeys": "", "filterValues": "",
+                               "mapData": "", "includeData": "", "excludeData": "", "autoCreateBuckets": True,
+                               "autoRemoveCollections": True, "forceUpdates": True}}
+        bucket_id = self.get_backups_bucket_id(tenant_id=tenant_id,
+                                               project_id=project_id,
+                                               cluster_id=source_cluster_id,
+                                               bucket_name=bucket_name)
+        url = r"{}/v2/organizations/{}/projects/{}/clusters/{}/buckets/{}/restore" \
+            .format(self.internal_url, tenant_id, project_id, source_cluster_id, bucket_id)
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
+        return resp
+
     def get_cluster_id(self, cluster_name):
         return self._get_meta_data(cluster_name=cluster_name)['id']
 
