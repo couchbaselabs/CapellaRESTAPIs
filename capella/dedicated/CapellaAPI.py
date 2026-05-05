@@ -1376,6 +1376,29 @@ class CapellaAPI(CommonCapellaAPI):
                                     headers=self.cbc_api_request_headers)
         return resp
 
+    def create_cluster_feature_flag(self, tenant_id, cluster_id, flag_name, payload):
+        url = "{}/internal/support/features/{}/clusters/{}/flags/{}".format(
+            self.internal_url, tenant_id, cluster_id, flag_name)
+        resp = self._urllib_request(url, method="POST",
+                                    params=json.dumps(payload),
+                                    headers=self.cbc_api_request_headers)
+        return resp
+
+    def update_cluster_feature_flag(self, tenant_id, cluster_id, flag_name, payload):
+        url = "{}/internal/support/features/{}/clusters/{}/flags/{}".format(
+            self.internal_url, tenant_id, cluster_id, flag_name)
+        resp = self._urllib_request(url, method="PUT",
+                                    params=json.dumps(payload),
+                                    headers=self.cbc_api_request_headers)
+        return resp
+
+    def delete_cluster_feature_flag(self, tenant_id, cluster_id, flag_name):
+        url = "{}/internal/support/features/{}/clusters/{}/flags/{}".format(
+            self.internal_url, tenant_id, cluster_id, flag_name)
+        resp = self._urllib_request(url, method="DELETE",
+                                    headers=self.cbc_api_request_headers)
+        return resp
+
     def initialize_feature_flags_from_launchdarkly(self):
         url = "{}/internal/support/features/flags/initialize".format(self.internal_url)
         resp = self._urllib_request(url, method="POST",
