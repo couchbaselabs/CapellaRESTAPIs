@@ -2269,6 +2269,14 @@ class CapellaAPI(CommonCapellaAPI):
         resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers)
         return resp
 
+    def override_fusion_rebalances(self, cluster_id, override):
+        url = "{}/internal/support/clusters/{}/fusion/overrideRebalances".format(
+            self.internal_url, cluster_id)
+        body = json.dumps({"override": override})
+        resp = self._urllib_request(url, method="POST", headers=self.cbc_api_request_headers,
+                                    params=body)
+        return resp
+
     def fusion_status_internal(self, cluster_id):
         url = "{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
         resp = self._urllib_request(url, method="GET", headers=self.cbc_api_request_headers)
