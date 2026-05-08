@@ -48,6 +48,8 @@ class ClusterOperationsAPIs(APIRequests):
         self.private_network_command_endpoint = self.list_private_networks_endpoint[:-1] + "Command"
         self.associate_private_network_endpoint = self.list_private_networks_endpoint + "/{}/associate"
         self.unassociate_private_network_endpoint = self.list_private_networks_endpoint + "/{}/unassociate"
+        self.associate_cmek_endpoint = self.cluster_endpoint + "/{}/cmek/{}/associate"
+        self.unassociate_cmek_endpoint = self.cluster_endpoint + "/{}/cmek/{}/unassociate"
 
         self.tenant_events_endpoint = organization_endpoint + "/{}/events"
         self.project_events_endpoint = organization_endpoint + "/{}/projects/{}/events"
@@ -3120,6 +3122,82 @@ class ClusterOperationsAPIs(APIRequests):
 
         resp = self.api_del(self.private_network_service_endpoint.format(
             organizationId, projectId, clusterId), params, headers)
+        return resp
+
+    def associate_cmek(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        """
+        Associates CMEK metadata with a cluster.
+
+        Args:
+            organizationId: ID of the organization. (UUID)
+            projectId: ID of the project. (UUID)
+            clusterId: ID of the cluster. (UUID)
+            cmekId: ID of the CMEK metadata. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code ONLY
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.cluster_ops_API_log.info(
+            "Associating CMEK {} with cluster {} in project {} in organization {}.".format(
+                cmekId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_post(
+            self.associate_cmek_endpoint.format(
+                organizationId, projectId, clusterId, cmekId),
+            params, headers)
+        return resp
+
+    def unassociate_cmek(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        """
+        Unassociates CMEK metadata from a cluster.
+
+        Args:
+            organizationId: ID of the organization. (UUID)
+            projectId: ID of the project. (UUID)
+            clusterId: ID of the cluster. (UUID)
+            cmekId: ID of the CMEK metadata. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code ONLY
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.cluster_ops_API_log.info(
+            "Unassociating CMEK {} from cluster {} in project {} in organization {}.".format(
+                cmekId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_post(
+            self.unassociate_cmek_endpoint.format(
+                organizationId, projectId, clusterId, cmekId),
+            params, headers)
         return resp
 
     def enable_private_endpoint_service(

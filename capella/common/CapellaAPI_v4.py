@@ -21,6 +21,14 @@ class OrganizationOperationsAPIs(APIRequests):
         self.apikeys_endpoint = self.organization_endpoint + "/{}/apikeys"
         self.users_endpoint = self.organization_endpoint + "/{}/users"
         self.project_endpoint = self.organization_endpoint + "/{}/projects"
+        self.project_cmek_endpoint = self.project_endpoint + "/{}/cmek"
+        self.cloud_accounts_endpoint = self.organization_endpoint + "/{}/cloudAccounts"
+        self.cmek_endpoint = self.organization_endpoint + "/{}/cmek"
+        self.cmek_history_endpoint = self.cmek_endpoint + "/{}/history"
+        self.cmek_providers_endpoint = self.cmek_endpoint + "/providers"
+        self.project_cmek_providers_endpoint = self.project_cmek_endpoint + "/providers"
+        self.cmek_azure_application_endpoint = self.organization_endpoint + "/{}/cmekAzureApplication"
+        self.project_cmek_azure_application_endpoint = self.project_endpoint + "/{}/cmekAzureApplication"
 
     """
     Method fetches the info of the organization mentioned.
@@ -62,6 +70,548 @@ class OrganizationOperationsAPIs(APIRequests):
             params = None
         resp = self.api_get(
             self.organization_endpoint, params, headers)
+        return resp
+
+    """
+    Method lists all the cloud accounts under organization mentioned.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Creator
+    - Organization Member
+    :param organizationId (str) Organization ID under which cloud accounts are present
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def list_cloud_accounts(self, organizationId, headers=None):
+        self.org_ops_API_log.info(
+            "Listing cloud accounts for organization {}".format(organizationId))
+        resp = self.api_get(
+            self.cloud_accounts_endpoint.format(organizationId), headers)
+        return resp
+
+    """
+    Method lists all CMEK metadata under organization mentioned.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Organization Member
+    :param organizationId (str) Organization ID under which CMEK metadata are present
+    :param page (int) Sets what page you would like to view
+    :param perPage (int) Sets how many results you would like to have on each page
+    :param sortBy ([string]) Sets order of how you would like to sort results and also the key you would like to order by
+                             Example: sortBy=name
+    :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def list_cmek_metadata(
+            self,
+            organizationId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Listing CMEK metadata for organization {}".format(organizationId))
+
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(self.cmek_endpoint.format(organizationId),
+                            params, headers)
+        return resp
+
+    """
+    Method creates CMEK metadata under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    :param organizationId (str) Organization ID under which CMEK metadata has to be created.
+    :param name (str) Name of the key.
+    :param config (dict) Config for provider key metadata.
+    :param description (str) Description of the key metadata.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def create_cmek_metadata(
+            self,
+            organizationId,
+            name,
+            config,
+            description="",
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Creating CMEK metadata in organization {}".format(organizationId))
+        params = {
+            "name": name,
+            "config": config
+        }
+        if description:
+            params["description"] = description
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_post(
+            self.cmek_endpoint.format(organizationId), params, headers)
+        return resp
+
+    """
+    Method lists all project-level CMEK metadata under organization and project mentioned.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which the project is present.
+    :param projectId (str) Project ID under which CMEK metadata are present.
+    :param page (int) Sets what page you would like to view
+    :param perPage (int) Sets how many results you would like to have on each page
+    :param sortBy ([string]) Sets order of how you would like to sort results and also the key you would like to order by
+                             Example: sortBy=name
+    :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def list_project_cmek_metadata(
+            self,
+            organizationId,
+            projectId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Listing project CMEK metadata for project {} in organization {}".format(
+                projectId, organizationId))
+
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(
+            self.project_cmek_endpoint.format(organizationId, projectId),
+            params, headers)
+        return resp
+
+    """
+    Method creates project-level CMEK metadata under an organization and project.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which the project is present.
+    :param projectId (str) Project ID under which CMEK metadata has to be created.
+    :param name (str) Name of the key.
+    :param config (dict) Config for provider key metadata.
+    :param description (str) Description of the key metadata.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def create_project_cmek_metadata(
+            self,
+            organizationId,
+            projectId,
+            name,
+            config,
+            description="",
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Creating project CMEK metadata in project {} in organization {}".format(
+                projectId, organizationId))
+        params = {
+            "name": name,
+            "config": config
+        }
+        if description:
+            params["description"] = description
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_post(
+            self.project_cmek_endpoint.format(organizationId, projectId),
+            params, headers)
+        return resp
+
+    """
+    Method fetches project-level CMEK metadata by id.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which the project is present.
+    :param projectId (str) Project ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be fetched.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def fetch_project_cmek_metadata(
+            self,
+            organizationId,
+            projectId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Fetching project CMEK metadata {} in project {} in organization {}".format(
+                cmekId, projectId, organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            "{}/{}".format(
+                self.project_cmek_endpoint.format(organizationId, projectId),
+                cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method updates project-level CMEK metadata by id.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which the project is present.
+    :param projectId (str) Project ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be updated.
+    :param config (dict) Config for provider key metadata.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def update_project_cmek_metadata(
+            self,
+            organizationId,
+            projectId,
+            cmekId,
+            config,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Updating project CMEK metadata {} in project {} in organization {}".format(
+                cmekId, projectId, organizationId))
+        params = {
+            "config": config
+        }
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            "{}/{}".format(
+                self.project_cmek_endpoint.format(organizationId, projectId),
+                cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method deletes project-level CMEK metadata by id.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which the project is present.
+    :param projectId (str) Project ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be deleted.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def delete_project_cmek_metadata(
+            self,
+            organizationId,
+            projectId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Deleting project CMEK metadata {} in project {} in organization {}".format(
+                cmekId, projectId, organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            "{}/{}".format(
+                self.project_cmek_endpoint.format(organizationId, projectId),
+                cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method deletes CMEK metadata under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    :param organizationId (str) Organization ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be deleted.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def delete_cmek_metadata(
+            self,
+            organizationId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Deleting CMEK metadata {} in organization {}".format(
+                cmekId, organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            "{}/{}".format(self.cmek_endpoint.format(organizationId), cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method enables CMEK feature for a cloud services provider under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    :param organizationId (str) Organization ID under which CMEK provider has to be enabled.
+    :param cloudProvider (str) Cloud provider. Accepted values: aws, gcp, azure.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def enable_cmek_provider(
+            self,
+            organizationId,
+            cloudProvider,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Enabling CMEK for provider {} in organization {}".format(
+                cloudProvider, organizationId))
+        params = {
+            "cloudProvider": cloudProvider
+        }
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            self.cmek_providers_endpoint.format(organizationId),
+            params, headers)
+        return resp
+
+    """
+    Method enables CMEK feature for a cloud services provider under an organization project.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which project is present.
+    :param projectId (str) Project ID under which CMEK provider has to be enabled.
+    :param cloudProvider (str) Cloud provider. Accepted values: azure.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def enable_project_cmek_provider(
+            self,
+            organizationId,
+            projectId,
+            cloudProvider,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Enabling project CMEK for provider {} in project {} in organization {}".format(
+                cloudProvider, projectId, organizationId))
+        params = {
+            "cloudProvider": cloudProvider
+        }
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            self.project_cmek_providers_endpoint.format(
+                organizationId, projectId),
+            params, headers)
+        return resp
+
+    """
+    Method fetches CMEK metadata by id under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Organization Member
+    :param organizationId (str) Organization ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be fetched.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def fetch_cmek_metadata(
+            self,
+            organizationId,
+            cmekId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Fetching CMEK metadata {} in organization {}".format(
+                cmekId, organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            "{}/{}".format(self.cmek_endpoint.format(organizationId), cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method rotates CMEK metadata by id under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    :param organizationId (str) Organization ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID to be rotated.
+    :param config (dict) Config for provider key metadata.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def rotate_cmek_metadata(
+            self,
+            organizationId,
+            cmekId,
+            config,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Rotating CMEK metadata {} in organization {}".format(
+                cmekId, organizationId))
+        params = {
+            "config": config
+        }
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            "{}/{}".format(self.cmek_endpoint.format(organizationId), cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method lists CMEK key rotation history by id under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Organization Member
+    :param organizationId (str) Organization ID under which the CMEK metadata is present.
+    :param cmekId (str) CMEK metadata ID whose history has to be listed.
+    :param page (int) Sets what page you would like to view
+    :param perPage (int) Sets how many results you would like to have on each page
+    :param sortBy ([string]) Sets order of how you would like to sort results and also the key you would like to order by
+                             Accepted values: active, associatedAt, associatedBy, key
+    :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def list_cmek_history(
+            self,
+            organizationId,
+            cmekId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Listing CMEK history for metadata {} in organization {}".format(
+                cmekId, organizationId))
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_get(
+            self.cmek_history_endpoint.format(organizationId, cmekId),
+            params, headers)
+        return resp
+
+    """
+    Method fetches the Azure CMEK application ID under an organization.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Organization Member
+    :param organizationId (str) Organization ID under which Azure application is to be fetched.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def fetch_cmek_azure_application(
+            self,
+            organizationId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Fetching Azure CMEK application in organization {}".format(
+                organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.cmek_azure_application_endpoint.format(organizationId),
+            params, headers)
+        return resp
+
+    """
+    Method fetches the Azure CMEK application ID under an organization project.
+    In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+    - Organization Owner
+    - Project Owner
+    - Project Cluster Manager
+    :param organizationId (str) Organization ID under which project is present.
+    :param projectId (str) Project ID under which Azure application is to be fetched.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def fetch_project_cmek_azure_application(
+            self,
+            organizationId,
+            projectId,
+            headers=None,
+            **kwargs):
+        self.org_ops_API_log.info(
+            "Fetching Azure project CMEK application for project {} in organization {}".format(
+                projectId, organizationId))
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.project_cmek_azure_application_endpoint.format(
+                organizationId, projectId),
+            params, headers)
         return resp
 
     """
