@@ -24,6 +24,7 @@ class ClusterOperationsAPIs(APIRequests):
         self.collection_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/buckets/{}/scopes/{}/collections"
         self.backups_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/backups"
         self.backup_schedule_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/buckets/{}/backup/schedules"
+        self.cloud_snapshot_backup_schedule_endpoint = self.cluster_endpoint + "/{}/cloudsnapshotbackupschedule"
         self.sample_bucket_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/sampleBuckets"
         self.org_appservice_api = organization_endpoint + "/{}/appservices"
         self.cluster_appservice_api = self.cluster_endpoint + "/{}/appservices"
@@ -6018,6 +6019,92 @@ class ClusterOperationsAPIs(APIRequests):
             headers
         )
 
+        return resp
+
+    """
+    Creates or updates the cloud snapshot backup schedule for a cluster.
+    In order to access this endpoint, the provided API key must have at least one of the following roles:
+        Organization Owner
+        Project Owner
+    :param organizationId (str) Organization ID under which the cluster is present.
+    :param projectId (str) Project ID under which the cluster is present.
+    :param clusterId (str) Cluster ID of the cluster whose schedule has to be upserted.
+    :param interval (int) Represents the time interval (hours).
+    :param retention (int) Retention time of the backup (hours).
+    :param startTime (str) Start time in ISO 8601 format. e.g. '2026-06-01T16:00:00+00:00'.
+    :param copyToRegions (list) Optional list of regions to copy snapshots to. Only supported for AWS and Azure clusters.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def upsert_cloud_snapshot_backup_schedule(
+            self, organizationId, projectId, clusterId,
+            interval, retention, startTime, copyToRegions=None,
+            headers=None, **kwargs):
+        params = {
+            "interval": interval,
+            "retention": retention,
+            "startTime": startTime,
+        }
+        if copyToRegions is not None:
+            params["copyToRegions"] = copyToRegions
+
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    """
+    Fetches the cloud snapshot backup schedule for a cluster.
+    In order to access this endpoint, the provided API key must have at least one of the following roles:
+        Organization Owner
+        Project Owner
+    :param organizationId (str) Organization ID under which the cluster is present.
+    :param projectId (str) Project ID under which the cluster is present.
+    :param clusterId (str) Cluster ID of the cluster whose schedule has to be fetched.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def get_cloud_snapshot_backup_schedule(
+            self, organizationId, projectId, clusterId,
+            headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    """
+    Deletes the cloud snapshot backup schedule for a cluster.
+    In order to access this endpoint, the provided API key must have at least one of the following roles:
+        Organization Owner
+        Project Owner
+    :param organizationId (str) Organization ID under which the cluster is present.
+    :param projectId (str) Project ID under which the cluster is present.
+    :param clusterId (str) Cluster ID of the cluster whose schedule has to be deleted.
+    :param headers (dict) Headers to be sent with the API call.
+    :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+    """
+
+    def delete_cloud_snapshot_backup_schedule(
+            self, organizationId, projectId, clusterId,
+            headers=None, **kwargs):
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
         return resp
 
     def list_appservices(self, tenant_id, page=None, perPage=None, sortBy=None,
