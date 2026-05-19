@@ -24,6 +24,13 @@ class ClusterOperationsAPIs(APIRequests):
         self.collection_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/buckets/{}/scopes/{}/collections"
         self.backups_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/backups"
         self.backup_schedule_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/buckets/{}/backup/schedules"
+        self.cloud_snapshot_backups_cluster_endpoint = self.cluster_endpoint + "/{}/cloudsnapshotbackups"
+        self.cloud_snapshot_backups_project_endpoint = organization_endpoint + "/{}/projects/{}/cloudsnapshotbackups"
+        self.cloud_snapshot_backup_regions_endpoint = self.cloud_snapshot_backups_cluster_endpoint + "/regions"
+        self.cloud_snapshot_backup_restores_endpoint = self.cloud_snapshot_backups_cluster_endpoint + "/restores"
+        self.cloud_snapshot_backup_endpoint = self.cloud_snapshot_backups_cluster_endpoint + "/{}"
+        self.cloud_snapshot_backup_restore_endpoint = self.cloud_snapshot_backup_endpoint + "/restore"
+        self.cloud_snapshot_backup_clone_endpoint = self.cloud_snapshot_backups_project_endpoint + "/{}/clone"
         self.cloud_snapshot_backup_schedule_endpoint = self.cluster_endpoint + "/{}/cloudsnapshotbackupschedule"
         self.sample_bucket_endpoint = organization_endpoint + "/{}/projects/{}/clusters/{}/sampleBuckets"
         self.org_appservice_api = organization_endpoint + "/{}/appservices"
@@ -6104,6 +6111,282 @@ class ClusterOperationsAPIs(APIRequests):
         resp = self.api_del(
             self.cloud_snapshot_backup_schedule_endpoint.format(
                 organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    def create_cloud_snapshot_backup(self, organizationId, projectId, clusterId,
+                                     retention=None, regionsToCopy=None,
+                                     headers=None, **kwargs):
+        """
+        Creates a cloud snapshot backup for a cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster for which the backup has to be created.
+        :param retention (int) Optional retention time of the backup (hours).
+        :param regionsToCopy (list) Optional list of regions to copy the snapshot to. Only supported for AWS and Azure clusters.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {}
+        if retention is not None:
+            params["retention"] = retention
+        if regionsToCopy is not None:
+            params["regionsToCopy"] = regionsToCopy
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_post(
+            self.cloud_snapshot_backups_cluster_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    def list_cloud_snapshot_backups(self, organizationId, projectId, clusterId,
+                                    page=None, perPage=None, sortBy=None,
+                                    sortDirection=None, headers=None, **kwargs):
+        """
+        Lists all cloud snapshot backups for a cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster whose backups have to be listed.
+        :param page (int) Sets what page you would like to view.
+        :param perPage (int) Sets how many results you would like to have on each page.
+        :param sortBy ([str]) Sets order of how you would like to sort results and also the key you would like to order by.
+        :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_get(
+            self.cloud_snapshot_backups_cluster_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    def list_cloud_snapshot_restores(self, organizationId, projectId, clusterId,
+                                     page=None, perPage=None, sortBy=None,
+                                     sortDirection=None, headers=None,
+                                     **kwargs):
+        """
+        Lists all cloud snapshot restores for a cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster whose restores have to be listed.
+        :param page (int) Sets what page you would like to view.
+        :param perPage (int) Sets how many results you would like to have on each page.
+        :param sortBy ([str]) Sets order of how you would like to sort results and also the key you would like to order by.
+        :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_get(
+            self.cloud_snapshot_backup_restores_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    def list_cloud_snapshot_regions(self, organizationId, projectId, clusterId,
+                                    headers=None, **kwargs):
+        """
+        Lists the regions available for copying cloud snapshot backups for a cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster whose copy-to regions have to be listed.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_get(
+            self.cloud_snapshot_backup_regions_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+        return resp
+
+    def edit_cloud_snapshot_backup_retention(self, organizationId, projectId,
+                                             clusterId, backupId, retention,
+                                             headers=None, **kwargs):
+        """
+        Edits the retention of an existing cloud snapshot backup.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster under which the backup is present.
+        :param backupId (str) ID of the backup whose retention has to be updated.
+        :param retention (int) Retention time of the backup (hours).
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {"retention": retention}
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_put(
+            self.cloud_snapshot_backup_endpoint.format(
+                organizationId, projectId, clusterId, backupId),
+            params, headers)
+        return resp
+
+    def delete_cloud_snapshot_backup(self, organizationId, projectId, clusterId,
+                                     backupId, headers=None, **kwargs):
+        """
+        Deletes an existing cloud snapshot backup.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster under which the backup is present.
+        :param backupId (str) ID of the backup to be deleted.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+        resp = self.api_del(
+            self.cloud_snapshot_backup_endpoint.format(
+                organizationId, projectId, clusterId, backupId),
+            params, headers)
+        return resp
+
+    def restore_cloud_snapshot_backup(self, organizationId, projectId, clusterId,
+                                      backupId,
+                                      crossRegionRestorePreference=None,
+                                      headers=None, **kwargs):
+        """
+        Restores an existing cloud snapshot backup.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID of the cluster under which the backup is present.
+        :param backupId (str) ID of the backup to be restored.
+        :param crossRegionRestorePreference (str) Optional cross-region restore preference.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {}
+        if crossRegionRestorePreference is not None:
+            params["crossRegionRestorePreference"] = \
+                crossRegionRestorePreference
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_post(
+            self.cloud_snapshot_backup_restore_endpoint.format(
+                organizationId, projectId, clusterId, backupId),
+            params, headers)
+        return resp
+
+    def list_project_level_cloud_snapshot_backups(self, organizationId,
+                                                  projectId, page=None,
+                                                  perPage=None, sortBy=None,
+                                                  sortDirection=None,
+                                                  headers=None, **kwargs):
+        """
+        Lists all cloud snapshot backups under a project.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the project is present.
+        :param projectId (str) Project ID whose backups have to be listed.
+        :param page (int) Sets what page you would like to view.
+        :param perPage (int) Sets how many results you would like to have on each page.
+        :param sortBy ([str]) Sets order of how you would like to sort results and also the key you would like to order by.
+        :param sortDirection (str) The order on which the items will be sorted. Accepted Values - asc / desc.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_get(
+            self.cloud_snapshot_backups_project_endpoint.format(
+                organizationId, projectId),
+            params, headers)
+        return resp
+
+    def clone_cloud_snapshot_backup(self, organizationId, projectId, backupId,
+                                    name, cloudProvider, availability, support,
+                                    description="", zones=None, headers=None,
+                                    **kwargs):
+        """
+        Clones a cloud snapshot backup into a new cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the project is present.
+        :param projectId (str) Project ID under which the backup is present.
+        :param backupId (str) ID of the backup to be cloned.
+        :param name (str) Name of the cluster to be created from the clone.
+        :param cloudProvider (object) Cloud provider configuration where the cloned cluster will be hosted.
+        :param availability (object) Availability configuration for the cloned cluster.
+        :param support (object) Support configuration for the cloned cluster.
+        :param description (str) Optional description for the cloned cluster.
+        :param zones (list) Optional list of zones for the cloned cluster.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        params = {
+            "name": name,
+            "cloudProvider": cloudProvider,
+            "availability": availability,
+            "support": support
+        }
+        if description is not None:
+            params["description"] = description
+        if zones:
+            params["zones"] = zones
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_post(
+            self.cloud_snapshot_backup_clone_endpoint.format(
+                organizationId, projectId, backupId),
             params, headers)
         return resp
 
