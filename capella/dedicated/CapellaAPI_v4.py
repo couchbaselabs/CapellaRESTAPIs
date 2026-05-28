@@ -6390,6 +6390,37 @@ class ClusterOperationsAPIs(APIRequests):
             params, headers)
         return resp
 
+    def destroy_cloud_snapshot_backups(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            headers=None,
+            **kwargs):
+        """
+        Destroys all cloud snapshot backups for a cluster.
+        In order to access this endpoint, the provided API key must have at least one of the roles referenced below:
+        -Organization Owner
+        -Project Owner
+        :param organizationId (str) Organization ID under which the cluster is present.
+        :param projectId (str) Project ID under which the cluster is present.
+        :param clusterId (str) Cluster ID for which all backups are to be destroyed.
+        :param headers (dict) Headers to be sent with the API call.
+        :param kwargs (dict) Do not use this under normal circumstances. This is only to test negative scenarios.
+        """
+        self.cluster_ops_API_log.info(
+            "Destroying all cloud snapshot backups for cluster {} in project {} "
+            "in organization {}.".format(clusterId, projectId, organizationId))
+        params = {}
+        for k, v in kwargs.items():
+            params[k] = v
+        resp = self.api_del(
+            self.cloud_snapshot_backups_cluster_endpoint.format(
+                organizationId, projectId, clusterId),
+            params if params else None,
+            headers)
+        return resp
+
     def list_appservices(self, tenant_id, page=None, perPage=None, sortBy=None,
                          sortDirection=None, projectId=None, headers=None,
                          **kwargs):

@@ -14,6 +14,8 @@ class ColumnarAPIs(APIRequests):
         self.org_level_analytics_clusters_endpoint = "/v4/organizations/{}/analyticsClusters"
         self.on_off_endpoint = self.analytics_clusters_endpoint + "/{}/activationState"
         self.schedule_on_off_endpoint = self.analytics_clusters_endpoint + "/{}/onOffSchedule"
+        self.cloud_snapshot_backups_endpoint = self.analytics_clusters_endpoint + "/{}/cloudSnapshotBackups"
+        self.cloud_snapshot_backup_schedule_endpoint = self.analytics_clusters_endpoint + "/{}/cloudSnapshotBackupSchedule"
 
     def turn_analytics_cluster_off(
             self,
@@ -507,4 +509,389 @@ class ColumnarAPIs(APIRequests):
 
         resp = self.api_put(self.schedule_on_off_endpoint.format(
             organizationId, projectId, instanceId), params, headers)
+        return resp
+
+    def create_cloud_snapshot_backup(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            retention=None,
+            headers=None,
+            **kwargs):
+        """
+        Creates a cloud snapshot backup for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            retention: Retention period in hours. (int, optional)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 202, backup ID
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Creating cloud snapshot backup for instance {}, project {}, "
+            "tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {}
+        if retention is not None:
+            params["retention"] = retention
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_post(
+            self.cloud_snapshot_backups_endpoint.format(
+                organizationId, projectId, instanceId),
+            params if params else None,
+            headers)
+        return resp
+
+    def list_cloud_snapshot_backups(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        """
+        Lists cloud snapshot backups for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            page: Page number for pagination. (int)
+            perPage: Results per page. (int)
+            sortBy: Field to sort by. (str)
+            sortDirection: Sort direction, 'asc' or 'desc'. (str)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 200, list of backups
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Listing cloud snapshot backups for instance {}, project {}, "
+            "tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {}
+        if page is not None:
+            params["page"] = page
+        if perPage is not None:
+            params["perPage"] = perPage
+        if sortBy is not None:
+            params["sortBy"] = sortBy
+        if sortDirection is not None:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(
+            self.cloud_snapshot_backups_endpoint.format(
+                organizationId, projectId, instanceId),
+            params if params else None,
+            headers)
+        return resp
+
+    def update_cloud_snapshot_backup_retention(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            backupId,
+            retention,
+            headers=None,
+            **kwargs):
+        """
+        Updates the retention period for a cloud snapshot backup.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            backupId: The ID of the backup. (UUID)
+            retention: New retention period in hours. (int)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 204
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Updating retention for backup {}, instance {}, project {}, "
+            "tenant {}.".format(backupId, instanceId, projectId, organizationId))
+
+        params = {"retention": retention}
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_put(
+            "{}/{}".format(
+                self.cloud_snapshot_backups_endpoint.format(
+                    organizationId, projectId, instanceId),
+                backupId),
+            params,
+            headers)
+        return resp
+
+    def delete_cloud_snapshot_backup(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            backupId,
+            headers=None,
+            **kwargs):
+        """
+        Deletes a cloud snapshot backup.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            backupId: The ID of the backup to delete. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 202
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Deleting cloud snapshot backup {}, instance {}, project {}, "
+            "tenant {}.".format(backupId, instanceId, projectId, organizationId))
+
+        params = {}
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_del(
+            "{}/{}".format(
+                self.cloud_snapshot_backups_endpoint.format(
+                    organizationId, projectId, instanceId),
+                backupId),
+            params if params else None,
+            headers)
+        return resp
+
+    def restore_cloud_snapshot_backup(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            backupId,
+            headers=None,
+            **kwargs):
+        """
+        Initiates a restore from a cloud snapshot backup.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            backupId: The ID of the backup to restore from. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 202, restore ID
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Restoring cloud snapshot backup {}, instance {}, project {}, "
+            "tenant {}.".format(backupId, instanceId, projectId, organizationId))
+
+        params = {}
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_post(
+            "{}/{}/restore".format(
+                self.cloud_snapshot_backups_endpoint.format(
+                    organizationId, projectId, instanceId),
+                backupId),
+            params if params else None,
+            headers)
+        return resp
+
+    def list_cloud_snapshot_restores(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        """
+        Lists cloud snapshot restore operations for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            page: Page number for pagination. (int)
+            perPage: Results per page. (int)
+            sortBy: Field to sort by. (str)
+            sortDirection: Sort direction, 'asc' or 'desc'. (str)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 200, list of restores
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Listing cloud snapshot restores for instance {}, project {}, "
+            "tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {}
+        if page is not None:
+            params["page"] = page
+        if perPage is not None:
+            params["perPage"] = perPage
+        if sortBy is not None:
+            params["sortBy"] = sortBy
+        if sortDirection is not None:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(
+            "{}/restores".format(
+                self.cloud_snapshot_backups_endpoint.format(
+                    organizationId, projectId, instanceId)),
+            params if params else None,
+            headers)
+        return resp
+
+    def upsert_cloud_snapshot_backup_schedule(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            interval,
+            retention,
+            start_time,
+            headers=None,
+            **kwargs):
+        """
+        Creates or updates a cloud snapshot backup schedule for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            interval: Backup frequency in hours. (int)
+            retention: Retention period in hours. (int)
+            start_time: Start time in ISO 8601 format. (str)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 204
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Upserting cloud snapshot backup schedule for instance {}, "
+            "project {}, tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {
+            "interval": interval,
+            "retention": retention,
+            "startTime": start_time,
+        }
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_put(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, instanceId),
+            params,
+            headers)
+        return resp
+
+    def get_cloud_snapshot_backup_schedule(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            headers=None,
+            **kwargs):
+        """
+        Retrieves the cloud snapshot backup schedule for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 200 (schedule exists) or 204 (no schedule)
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Getting cloud snapshot backup schedule for instance {}, "
+            "project {}, tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {}
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, instanceId),
+            params if params else None,
+            headers)
+        return resp
+
+    def delete_cloud_snapshot_backup_schedule(
+            self,
+            organizationId,
+            projectId,
+            instanceId,
+            headers=None,
+            **kwargs):
+        """
+        Deletes the cloud snapshot backup schedule for a Columnar analytics cluster.
+
+        Args:
+            organizationId: The ID of the tenant. (UUID)
+            projectId: The ID of the project. (UUID)
+            instanceId: The ID of the analytics cluster. (UUID)
+            headers: Headers to be sent with the API call. (dict)
+            **kwargs: Do not use this under normal circumstances. This is only to test negative scenarios. (dict)
+
+        Returns:
+            Success : Status Code 204
+            Error : message, hint, code, HttpStatusCode
+        """
+        self.columnar_ops_API_log.info(
+            "Deleting cloud snapshot backup schedule for instance {}, "
+            "project {}, tenant {}.".format(instanceId, projectId, organizationId))
+
+        params = {}
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_del(
+            self.cloud_snapshot_backup_schedule_endpoint.format(
+                organizationId, projectId, instanceId),
+            params if params else None,
+            headers)
         return resp
