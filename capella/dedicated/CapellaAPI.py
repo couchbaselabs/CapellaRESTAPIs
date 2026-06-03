@@ -2304,3 +2304,136 @@ class CapellaAPI(CommonCapellaAPI):
         url = "{}/internal/support/clusters/{}/fusion/status".format(self.internal_url, cluster_id)
         resp = self._urllib_request(url, method="GET", headers=self.cbc_api_request_headers)
         return resp
+
+    # -----------------------------------------------------------------------
+    # Cloud snapshot backup / restore  (v2 internal API)
+    # -----------------------------------------------------------------------
+
+    def create_cloud_snapshot_backup(self, tenant_id, project_id, cluster_id,
+                                     retention=None, regions_to_copy=None):
+        url = "{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups".format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        payload = {}
+        if retention is not None:
+            payload["retention"] = retention
+        if regions_to_copy is not None:
+            payload["regionsToCopy"] = regions_to_copy
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
+        return resp
+
+    def list_cloud_snapshot_backups(self, tenant_id, project_id, cluster_id,
+                                    page=1, per_page=100):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}/cloudsnapshotbackups"
+               "?page={}&perPage={}").format(
+            self.internal_url, tenant_id, project_id, cluster_id, page, per_page)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def restore_cloud_snapshot_backup(self, tenant_id, project_id, cluster_id,
+                                      backup_id, cross_region_restore_preference=None):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups/{}/restore").format(
+            self.internal_url, tenant_id, project_id, cluster_id, backup_id)
+        payload = {}
+        if cross_region_restore_preference is not None:
+            payload["crossRegionRestorePreference"] = cross_region_restore_preference
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
+        return resp
+
+    def list_cloud_snapshot_restores(self, tenant_id, project_id, cluster_id,
+                                     page=1, per_page=100):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups/restores?page={}&perPage={}").format(
+            self.internal_url, tenant_id, project_id, cluster_id, page, per_page)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def list_cloud_snapshot_regions(self, tenant_id, project_id, cluster_id):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups/regions").format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def edit_cloud_snapshot_backup_retention(self, tenant_id, project_id,
+                                             cluster_id, backup_id, retention):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups/{}").format(
+            self.internal_url, tenant_id, project_id, cluster_id, backup_id)
+        payload = {"retention": retention}
+        resp = self.do_internal_request(url, method="PUT", params=json.dumps(payload))
+        return resp
+
+    def delete_cloud_snapshot_backup(self, tenant_id, project_id, cluster_id,
+                                     backup_id):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups/{}").format(
+            self.internal_url, tenant_id, project_id, cluster_id, backup_id)
+        resp = self.do_internal_request(url, method="DELETE")
+        return resp
+
+    def destroy_cloud_snapshot_backups(self, tenant_id, project_id, cluster_id):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackups").format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        resp = self.do_internal_request(url, method="DELETE")
+        return resp
+
+    def list_project_level_cloud_snapshot_backups(self, tenant_id, project_id,
+                                                  page=1, per_page=100):
+        url = ("{}/v2/organizations/{}/projects/{}/cloudsnapshotbackups"
+               "?page={}&perPage={}").format(
+            self.internal_url, tenant_id, project_id, page, per_page)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def clone_cloud_snapshot_backup(self, tenant_id, project_id, backup_id,
+                                    name, cloud_provider, availability, support,
+                                    description=None, zones=None):
+        url = ("{}/v2/organizations/{}/projects/{}/cloudsnapshotbackups"
+               "/{}/clone").format(
+            self.internal_url, tenant_id, project_id, backup_id)
+        payload = {
+            "name": name,
+            "cloudProvider": cloud_provider,
+            "availability": availability,
+            "support": support,
+        }
+        if description is not None:
+            payload["description"] = description
+        if zones is not None:
+            payload["zones"] = zones
+        resp = self.do_internal_request(url, method="POST", params=json.dumps(payload))
+        return resp
+
+    def upsert_cloud_snapshot_backup_schedule(self, tenant_id, project_id,
+                                              cluster_id, interval, retention,
+                                              start_time, copy_to_regions=None):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackupschedule").format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        payload = {
+            "interval": interval,
+            "retention": retention,
+            "startTime": start_time,
+        }
+        if copy_to_regions is not None:
+            payload["copyToRegions"] = copy_to_regions
+        resp = self.do_internal_request(url, method="PUT", params=json.dumps(payload))
+        return resp
+
+    def get_cloud_snapshot_backup_schedule(self, tenant_id, project_id,
+                                           cluster_id):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackupschedule").format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        resp = self.do_internal_request(url, method="GET")
+        return resp
+
+    def delete_cloud_snapshot_backup_schedule(self, tenant_id, project_id,
+                                              cluster_id):
+        url = ("{}/v2/organizations/{}/projects/{}/clusters/{}"
+               "/cloudsnapshotbackupschedule").format(
+            self.internal_url, tenant_id, project_id, cluster_id)
+        resp = self.do_internal_request(url, method="DELETE")
+        return resp
