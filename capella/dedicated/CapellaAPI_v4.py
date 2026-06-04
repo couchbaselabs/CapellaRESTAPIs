@@ -106,6 +106,11 @@ class ClusterOperationsAPIs(APIRequests):
         self.billing_pay_as_you_go_endpoint = self.billing_base_endpoint + "/payAsYouGo"
         self.billing_download_categorized_csv_endpoint = self.billing_base_endpoint + "/download"
         self.billing_download_itemized_per_cluster_csv_endpoint = self.cluster_endpoint + "/{}/billing/download"
+        self.replications_endpoint = self.cluster_endpoint + "/{}/replications"
+        self.replication_jobs_endpoint = self.replications_endpoint + "/jobs"
+        self.project_replications_endpoint = organization_endpoint + "/{}/projects/{}/replications"
+        self.replication_activation_status_endpoint = \
+            self.replications_endpoint + "/{}/activationStatus"
     
     def create_user(
             self,
@@ -8208,4 +8213,249 @@ class CapellaAPI(CommonCapellaAPI):
         url = '{}/v2/databases/{}/proxy/pools/default/trustedCAs' \
             .format(self.internal_url, cluster_id)
         resp = self.do_internal_request(url, method="GET")
+        return resp
+        
+    def list_cluster_replications(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        """
+        Lists replications for a cluster.
+        """
+        self.cluster_ops_API_log.info(
+            "Listing replications for cluster {}, in project {}, in tenant {}"
+            .format(clusterId, projectId, organizationId))
+
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(self.replications_endpoint.format(
+            organizationId, projectId, clusterId), params, headers)
+        return resp
+
+    def create_replication(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            payload,
+            headers=None,
+            **kwargs):
+        """
+        Creates a replication for a cluster.
+        """
+        self.cluster_ops_API_log.info(
+            "Creating replication for cluster {}, in project {}, in tenant {}"
+            .format(clusterId, projectId, organizationId))
+
+        params = payload
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_post(self.replications_endpoint.format(
+            organizationId, projectId, clusterId), params, headers)
+        return resp
+
+    def fetch_replication_job_info(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            jobId,
+            headers=None,
+            **kwargs):
+        """
+        Fetches details for a replication job.
+        """
+        self.cluster_ops_API_log.info(
+            "Fetching replication job {} for cluster {}, in project {}, in "
+            "tenant {}".format(jobId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_get("{}/{}".format(
+            self.replication_jobs_endpoint.format(
+                organizationId, projectId, clusterId), jobId), params, headers)
+        return resp
+
+    def fetch_replication_info(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            replicationId,
+            headers=None,
+            **kwargs):
+        """
+        Fetches details for a specific replication.
+        """
+        self.cluster_ops_API_log.info(
+            "Fetching replication {} for cluster {}, in project {}, in tenant "
+            "{}".format(replicationId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_get("{}/{}".format(
+            self.replications_endpoint.format(
+                organizationId, projectId, clusterId), replicationId),
+            params, headers)
+        return resp
+
+    def update_replication(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            replicationId,
+            payload,
+            headers=None,
+            **kwargs):
+        """
+        Updates a specific replication.
+        """
+        self.cluster_ops_API_log.info(
+            "Updating replication {} for cluster {}, in project {}, in tenant "
+            "{}".format(replicationId, clusterId, projectId, organizationId))
+
+        params = payload
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_put("{}/{}".format(
+            self.replications_endpoint.format(
+                organizationId, projectId, clusterId), replicationId),
+            params, headers)
+        return resp
+
+    def delete_replication(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            replicationId,
+            headers=None,
+            **kwargs):
+        """
+        Deletes a specific replication.
+        """
+        self.cluster_ops_API_log.info(
+            "Deleting replication {} for cluster {}, in project {}, in tenant "
+            "{}".format(replicationId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_del("{}/{}".format(
+            self.replications_endpoint.format(
+                organizationId, projectId, clusterId), replicationId),
+            params, headers)
+        return resp
+
+    def activate_replication(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            replicationId,
+            headers=None,
+            **kwargs):
+        """
+        Activates a specific replication.
+        """
+        self.cluster_ops_API_log.info(
+            "Activating replication {} for cluster {}, in project {}, in "
+            "tenant {}".format(
+                replicationId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_post(self.replication_activation_status_endpoint.format(
+            organizationId, projectId, clusterId, replicationId),
+            params, headers)
+        return resp
+
+    def deactivate_replication(
+            self,
+            organizationId,
+            projectId,
+            clusterId,
+            replicationId,
+            headers=None,
+            **kwargs):
+        """
+        Deactivates a specific replication.
+        """
+        self.cluster_ops_API_log.info(
+            "Deactivating replication {} for cluster {}, in project {}, in "
+            "tenant {}".format(
+                replicationId, clusterId, projectId, organizationId))
+
+        if kwargs:
+            params = kwargs
+        else:
+            params = None
+
+        resp = self.api_del(self.replication_activation_status_endpoint.format(
+            organizationId, projectId, clusterId, replicationId),
+            params, headers)
+        return resp
+
+    def list_project_replications(
+            self,
+            organizationId,
+            projectId,
+            page=None,
+            perPage=None,
+            sortBy=None,
+            sortDirection=None,
+            headers=None,
+            **kwargs):
+        """
+        Lists replications for a project.
+        """
+        self.cluster_ops_API_log.info(
+            "Listing replications for project {}, in tenant {}".format(
+                projectId, organizationId))
+
+        params = {}
+        if page:
+            params["page"] = page
+        if perPage:
+            params["perPage"] = perPage
+        if sortBy:
+            params["sortBy"] = sortBy
+        if sortDirection:
+            params["sortDirection"] = sortDirection
+        for k, v in kwargs.items():
+            params[k] = v
+
+        resp = self.api_get(self.project_replications_endpoint.format(
+            organizationId, projectId), params, headers)
         return resp
