@@ -160,6 +160,40 @@ class ClusterOperationsAPIs(APIRequests):
                 organizationId, projectId, clusterId), jobId), params, headers)
         return resp
 
+    def list_cluster_replications(
+                self,
+                organizationId,
+                projectId,
+                clusterId,
+                page=None,
+                perPage=None,
+                sortBy=None,
+                sortDirection=None,
+                headers=None,
+                **kwargs):
+            """
+            Lists replications for a cluster.
+            """
+            self.cluster_ops_API_log.info(
+                "Listing replications for cluster {}, in project {}, in tenant {}"
+                .format(clusterId, projectId, organizationId))
+
+            params = {}
+            if page:
+                params["page"] = page
+            if perPage:
+                params["perPage"] = perPage
+            if sortBy:
+                params["sortBy"] = sortBy
+            if sortDirection:
+                params["sortDirection"] = sortDirection
+            for k, v in kwargs.items():
+                params[k] = v
+
+            resp = self.api_get(self.replications_endpoint.format(
+                organizationId, projectId, clusterId), params, headers)
+            return resp
+
     def fetch_replication_info(
             self,
             organizationId,
