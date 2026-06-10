@@ -275,7 +275,11 @@ class APIRequests(object):
 
     def _urllib_request(self, api, method='GET', headers=None,
                         params='', timeout=300, verify=False):
-        session = requests.Session()
+        # Re-use the shared session so connections are pooled/kept-alive
+        # instead of opening (and leaking) a fresh socket per call, which
+        # exhausts ephemeral ports under Jython (BindException: Address
+        # already in use).
+        session = self.network_session
         try:
             if method == "GET":
                 resp = session.get(api, params=params, headers=headers,
