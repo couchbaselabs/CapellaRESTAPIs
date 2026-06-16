@@ -38,6 +38,12 @@ class ClusterOperationsAPIs(APIRequests):
         self.cluster_on_off_schedule_endpoint = self.cluster_endpoint + "/{}/onOffSchedule"
         self.cluster_on_off_endpoint = self.cluster_endpoint + "/{}/activationState"
         self.appservice_on_off_endpoint = self.cluster_appservice_api + "/{}/activationState"
+        self.eventing_functions_endpoint = self.cluster_endpoint + "/{}/eventingFunctions"
+        self.eventing_function_endpoint = self.eventing_functions_endpoint + "/{}"
+        self.eventing_function_code_endpoint = self.eventing_function_endpoint + "/code"
+        self.eventing_function_activation_state_endpoint = \
+            self.eventing_function_endpoint + "/activationState"
+        self.eventing_function_logs_endpoint = self.eventing_function_endpoint + "/logs"
 
         self.alerts_endpoint = organization_endpoint + "/{}/projects/{}/alertIntegrations"
         self.test_alert_endpoint = self.alerts_endpoint[:-1] + "Test"
@@ -58,6 +64,11 @@ class ClusterOperationsAPIs(APIRequests):
         self.unassociate_private_network_endpoint = self.list_private_networks_endpoint + "/{}/unassociate"
         self.associate_cmek_endpoint = self.cluster_endpoint + "/{}/cmek/{}/associate"
         self.unassociate_cmek_endpoint = self.cluster_endpoint + "/{}/cmek/{}/unassociate"
+        self.replications_endpoint = self.cluster_endpoint + "/{}/replications"
+        self.replication_jobs_endpoint = self.replications_endpoint + "/jobs"
+        self.project_replications_endpoint = organization_endpoint + "/{}/projects/{}/replications"
+        self.replication_activation_status_endpoint = \
+            self.replications_endpoint + "/{}/activationStatus"
 
         self.tenant_events_endpoint = organization_endpoint + "/{}/events"
         self.project_events_endpoint = organization_endpoint + "/{}/projects/{}/events"
@@ -7236,6 +7247,100 @@ class ClusterOperationsAPIs(APIRequests):
         resp = self.api_post(
             self.billing_download_itemized_per_cluster_csv_endpoint.format(organizationId, projectId, clusterId), params, headers)
         return resp
+
+    def list_eventing_functions(
+            self, organizationId, projectId, clusterId, status=None,
+            headers=None, **kwargs):
+        params = kwargs if kwargs else {}
+        if status is not None:
+            params["status"] = status
+        if not params:
+            params = None
+        return self.api_get(
+            self.eventing_functions_endpoint.format(
+                organizationId, projectId, clusterId), params, headers)
+
+    def get_eventing_function(
+            self, organizationId, projectId, clusterId, functionName,
+            export=None, headers=None, **kwargs):
+        params = kwargs if kwargs else {}
+        if export is not None:
+            params["export"] = export
+        if not params:
+            params = None
+        return self.api_get(
+            self.eventing_function_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            params, headers)
+
+    def create_eventing_function_v4(
+            self, organizationId, projectId, clusterId, payload,
+            headers=None, **kwargs):
+        params = dict(payload)
+        params.update(kwargs)
+        return self.api_post(
+            self.eventing_functions_endpoint.format(
+                organizationId, projectId, clusterId),
+            params, headers)
+
+    def update_eventing_function_v4(
+            self, organizationId, projectId, clusterId, functionName, payload,
+            headers=None, **kwargs):
+        params = dict(payload)
+        params.update(kwargs)
+        return self.api_put(
+            self.eventing_function_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            params, headers)
+
+    def delete_eventing_function_v4(
+            self, organizationId, projectId, clusterId, functionName,
+            headers=None):
+        return self.api_del(
+            self.eventing_function_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            headers=headers)
+
+    def get_eventing_function_code(
+            self, organizationId, projectId, clusterId, functionName,
+            headers=None, **kwargs):
+        params = kwargs if kwargs else None
+        return self.api_get(
+            self.eventing_function_code_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            params, headers)
+
+    def update_eventing_function_code(
+            self, organizationId, projectId, clusterId, functionName,
+            javascript_code, headers=None):
+        request_headers = {
+            "Content-Type": "application/javascript"
+        }
+        if headers:
+            request_headers.update(headers)
+        return self.api_put(
+            self.eventing_function_code_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            headers=request_headers, data_request_body=javascript_code)
+
+    def update_eventing_function_activation_state_v4(
+            self, organizationId, projectId, clusterId, functionName, state,
+            headers=None, **kwargs):
+        params = {"state": state}
+        params.update(kwargs)
+        return self.api_put(
+            self.eventing_function_activation_state_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            params, headers)
+
+    def get_eventing_function_logs(
+            self, organizationId, projectId, clusterId, functionName,
+            headers=None, **kwargs):
+        params = kwargs if kwargs else None
+        return self.api_get(
+            self.eventing_function_logs_endpoint.format(
+                organizationId, projectId, clusterId, functionName),
+            params, headers)
 
 class CapellaAPI(CommonCapellaAPI):
 
