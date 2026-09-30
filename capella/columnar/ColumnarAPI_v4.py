@@ -10,8 +10,8 @@ class ColumnarAPIs(APIRequests):
     def __init__(self, url, secret, access, bearer_token):
         super(ColumnarAPIs, self).__init__(url, secret, access, bearer_token)
         self.columnar_ops_API_log = logging.getLogger(__name__)
-        self.analytics_clusters_endpoint = "/v4/organizations/{}/projects/{}/analyticsClusters"
-        self.org_level_analytics_clusters_endpoint = "/v4/organizations/{}/analyticsClusters"
+        self.analytics_clusters_endpoint = "/v4/organizations/{}/projects/{}/operationalInsightsClusters"
+        self.org_level_analytics_clusters_endpoint = "/v4/organizations/{}/operationalInsightsClusters"
         self.on_off_endpoint = self.analytics_clusters_endpoint + "/{}/activationState"
         self.schedule_on_off_endpoint = self.analytics_clusters_endpoint + "/{}/onOffSchedule"
         self.cloud_snapshot_backups_endpoint = self.analytics_clusters_endpoint + "/{}/cloudSnapshotBackups"
